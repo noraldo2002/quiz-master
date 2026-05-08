@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>سين جيم - Quiz Game</title>
+<title>سين جيم - Pro Game</title>
 
 <style>
 body {
@@ -13,7 +13,6 @@ body {
     margin: 0;
 }
 
-/* Buttons */
 button {
     padding: 14px;
     margin: 6px;
@@ -27,7 +26,6 @@ button {
     background: linear-gradient(45deg, #2563eb, #3b82f6);
     color: white;
     font-weight: bold;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
 }
 
 .option {
@@ -50,36 +48,38 @@ justify-content:center;
 align-items:center;
 }
 
+input{
+padding:10px;
+margin:5px;
+border-radius:10px;
+text-align:center;
+width:70%;
+}
+
 /* Result */
 #result { display:none; }
 
-/* Question */
 #question {
     margin: 20px;
     font-size: 18px;
-}
-
-input {
-    padding:10px;
-    border-radius:10px;
-    text-align:center;
-    font-size:16px;
-    width:70%;
 }
 </style>
 </head>
 
 <body>
 
-<!-- 🚀 SPLASH -->
+<!-- 🚀 START SCREEN -->
 <div id="splashScreen">
 
-<h1>🎮 سين جيم</h1>
+<h1>🎮 سين جيم Pro</h1>
 
-<input id="playerName" placeholder="اكتب اسمك">
+<input id="playerName" placeholder="اسم اللاعب">
+
+<input id="team1" placeholder="اسم الفريق الأول">
+<input id="team2" placeholder="اسم الفريق الثاني">
 
 <button onclick="startApp()" style="background:#22c55e; color:white;">
-ابدأ اللعب
+ابدأ التحدي 🔥
 </button>
 
 </div>
@@ -94,7 +94,7 @@ input {
 <button class="category" onclick="startQuiz('general')">📚 معلومات عامة</button>
 <button class="category" onclick="startQuiz('science')">🔬 علوم</button>
 <button class="category" onclick="startQuiz('sports')">⚽ رياضة</button>
-<button class="category" onclick="startQuiz('series')">🎬 مسلسلات عربية</button>
+<button class="category" onclick="startQuiz('series')">🎬 مسلسلات</button>
 
 </div>
 
@@ -102,7 +102,7 @@ input {
 <div id="game" style="display:none;">
 
 <div>
-⭐ النقاط: <span id="score">0</span>
+⭐ <span id="score">0</span>
 </div>
 
 <h3 id="question"></h3>
@@ -128,15 +128,28 @@ input {
 <script>
 
 let player = "";
+let teamA = "A";
+let teamB = "B";
 
-/* 🚀 تشغيل التطبيق */
+let scoreA = 0;
+let scoreB = 0;
+
+let turn = "A";
+let comboA = 0;
+let comboB = 0;
+
+let questions = [];
+let current = 0;
+let timer;
+let timeLeft = 15;
+
+/* 🚀 تشغيل */
 function startApp(){
+
  player = document.getElementById("playerName").value;
 
- if(player == ""){
-  alert("اكتب اسمك أولاً");
-  return;
- }
+ teamA = document.getElementById("team1").value || "الفريق 1";
+ teamB = document.getElementById("team2").value || "الفريق 2";
 
  document.getElementById("splashScreen").style.display="none";
  document.getElementById("menu").style.display="block";
@@ -146,34 +159,24 @@ function startApp(){
 let data = {
  general: [
   {q:"ما عاصمة الأردن؟", a:"عمان", b:"دمشق", c:"بيروت", d:"بغداد", correct:"A"},
-  {q:"عدد قارات العالم؟", a:"5", b:"6", c:"7", d:"8", correct:"C"},
-  {q:"عملة الأردن؟", a:"دينار", b:"دولار", c:"يورو", d:"ريال", correct:"A"}
+  {q:"عدد القارات؟", a:"5", b:"6", c:"7", d:"8", correct:"C"}
  ],
 
  science: [
   {q:"أكبر كوكب؟", a:"الأرض", b:"المريخ", c:"المشتري", d:"الزهرة", correct:"C"},
-  {q:"وحدة القوة؟", a:"نيوتن", b:"جول", c:"واط", d:"أمبير", correct:"A"},
-  {q:"عدد الكواكب؟", a:"7", b:"8", c:"9", d:"10", correct:"B"}
+  {q:"وحدة القوة؟", a:"نيوتن", b:"جول", c:"واط", d:"أمبير", correct:"A"}
  ],
 
  sports: [
   {q:"لاعبين كرة القدم؟", a:"9", b:"10", c:"11", d:"12", correct:"C"},
-  {q:"كم شوط؟", a:"1", b:"2", c:"3", d:"4", correct:"B"},
   {q:"مدة المباراة؟", a:"90", b:"80", c:"100", d:"70", correct:"A"}
  ],
 
  series: [
   {q:"بطل الولادة من الخاصرة؟", a:"تيم حسن", b:"قصي خولي", c:"باسل خياط", d:"معتصم النهار", correct:"B"},
-  {q:"بلد التصوير؟", a:"سوريا", b:"لبنان", c:"الأردن", d:"مصر", correct:"A"},
-  {q:"نوع المسلسل؟", a:"دراما اجتماعية", b:"كوميدي", c:"أكشن", d:"رعب", correct:"A"}
+  {q:"نوع المسلسل؟", a:"دراما", b:"كوميدي", c:"أكشن", d:"رعب", correct:"A"}
  ]
 };
-
-let questions = [];
-let current = 0;
-let score = 0;
-let timer;
-let timeLeft = 15;
 
 /* 🔀 خلط */
 function shuffle(arr){
@@ -187,19 +190,18 @@ function startQuiz(cat){
 
  questions = shuffle(data[cat]);
  current = 0;
- score = 0;
 
- updateScore();
  loadQuestion();
  startTimer();
 }
 
 /* ❓ سؤال */
 function loadQuestion(){
+
  let q = questions[current];
 
  document.getElementById("question").innerText =
- "❓ " + q.q + " (" + (current+1) + "/" + questions.length + ")";
+ "❓ " + q.q + " ("+(current+1)+"/"+questions.length+")";
 
  document.getElementById("A").innerText = q.a;
  document.getElementById("B").innerText = q.b;
@@ -214,21 +216,39 @@ function loadQuestion(){
 
 /* 🔘 إجابة */
 function answer(choice){
+
  let q = questions[current];
 
  disableButtons();
+ clearInterval(timer);
 
- if(choice == q.correct){
-  score += 10;
-  updateScore();
+ let correct = (choice == q.correct);
+
+ if(correct){
+
+  if(turn === "A"){
+   comboA++;
+   scoreA += 10 + (comboA * 2);
+  } else {
+   comboB++;
+   scoreB += 10 + (comboB * 2);
+  }
+
+ } else {
+  if(turn === "A") comboA = 0;
+  else comboB = 0;
  }
 
- clearInterval(timer);
+ turn = (turn === "A") ? "B" : "A";
+
+ updateScore();
+
  setTimeout(nextQuestion, 600);
 }
 
 /* ⏭ التالي */
 function nextQuestion(){
+
  current++;
 
  if(current >= questions.length){
@@ -241,21 +261,25 @@ function nextQuestion(){
 
 /* ⏱ Timer */
 function startTimer(){
+
  clearInterval(timer);
 
  timer = setInterval(()=>{
+
   timeLeft--;
   document.getElementById("time").innerText = timeLeft;
 
   if(timeLeft <= 0){
     nextQuestion();
   }
+
  },1000);
 }
 
 /* ⭐ نقاط */
 function updateScore(){
- document.getElementById("score").innerText = score;
+ document.getElementById("score").innerText =
+ teamA + ":" + scoreA + " | " + teamB + ":" + scoreB;
 }
 
 /* 🔒 أزرار */
@@ -273,25 +297,26 @@ function enableButtons(){
 
 /* 🏁 نهاية */
 function endGame(){
+
  clearInterval(timer);
 
  document.getElementById("game").style.display="none";
  document.getElementById("result").style.display="block";
 
- let grade = "";
+ let winner = "";
 
- if(score >= 80){
-  grade = "🔥 أسطورة سين جيم";
- } else if(score >= 50){
-  grade = "👍 لاعب جيد";
- } else {
-  grade = "😐 حاول مرة أخرى";
- }
+ if(scoreA > scoreB) winner = "🏆 " + teamA + " فاز";
+ else if(scoreB > scoreA) winner = "🏆 " + teamB + " فاز";
+ else winner = "🤝 تعادل";
 
  document.getElementById("finalText").innerText =
  "👤 اللاعب: " + player +
- "\n⭐ النقاط: " + score +
- "\n🏆 " + grade;
+ "\n\n" +
+ teamA + ": " + scoreA +
+ "\n" +
+ teamB + ": " + scoreB +
+ "\n\n" +
+ winner;
 }
 
 </script>

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,6 +11,36 @@ body {
     text-align: center;
     background: #0f172a;
     color: white;
+    margin: 0;
+}
+
+/* Loading */
+#loading {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: #0f172a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 22px;
+    animation: fadeOut 2s forwards;
+}
+
+@keyframes fadeOut {
+    0% {opacity:1;}
+    100% {opacity:0; visibility:hidden;}
+}
+
+/* Start Screen */
+#startScreen {
+    margin-top: 120px;
+    animation: pop 0.8s ease;
+}
+
+@keyframes pop {
+    from {transform: scale(0.5); opacity:0;}
+    to {transform: scale(1); opacity:1;}
 }
 
 button {
@@ -21,25 +52,41 @@ button {
     font-size: 16px;
 }
 
+.startBtn {
+    background: #22c55e;
+    color: white;
+    font-size: 22px;
+}
+
 .category { background: #2563eb; color: white; }
 .option { background: #1e293b; color: white; }
 
 #box { margin-top: 50px; }
+
 </style>
 </head>
 
 <body>
 
+<!-- 🔥 Loading -->
+<div id="loading">Loading Quiz...</div>
+
+<!-- 🎮 Start Screen -->
+<div id="startScreen" style="display:none;">
+    <h1>🎮 Quiz Master</h1>
+    <button class="startBtn" onclick="showMenu()">ابدأ اللعب</button>
+</div>
+
 <div id="box">
 
-<h2>🎮 Quiz Master</h2>
-
-<div id="menu">
+<!-- Menu -->
+<div id="menu" style="display:none;">
     <button class="category" onclick="startQuiz('general')">معلومات عامة</button>
     <button class="category" onclick="startQuiz('science')">علوم</button>
     <button class="category" onclick="startQuiz('sports')">رياضة</button>
 </div>
 
+<!-- Quiz -->
 <div id="quiz" style="display:none;">
     <h3 id="question"></h3>
 
@@ -52,26 +99,54 @@ button {
     <p>⭐ النقاط: <span id="score">0</span></p>
 </div>
 
+<!-- Result -->
 <div id="result" style="display:none;">
     <h2>انتهت اللعبة 🎉</h2>
     <p>نتيجتك: <span id="finalScore"></span></p>
-    <button onclick="location.reload()">إعادة</button>
+    <button onclick="location.reload()">إعادة اللعب</button>
 </div>
 
 </div>
 
 <script>
 
+/* 🎵 صوت بسيط */
+function playSound(){
+    let audio = new Audio("https://actions.google.com/sounds/v1/cartoon/pop.ogg");
+    audio.play();
+}
+
+/* بعد التحميل */
+setTimeout(()=>{
+    document.getElementById("loading").style.display="none";
+    document.getElementById("startScreen").style.display="block";
+},2000);
+
+/* Start Screen */
+function showMenu(){
+    playSound();
+    document.getElementById("startScreen").style.display="none";
+    document.getElementById("menu").style.display="block";
+}
+
+/* Data */
 let data = {
  general: [
-  {q:"ما عاصمة الأردن؟", a:"عمان", b:"دمشق", c:"القاهرة", d:"بغداد", correct:"A"},
-  {q:"كم عدد قارات العالم؟", a:"5", b:"6", c:"7", d:"8", correct:"C"}
+  {q:"ما عاصمة الأردن؟", a:"عمان", b:"دمشق", c:"بيروت", d:"بغداد", correct:"A"},
+  {q:"كم قارة بالعالم؟", a:"5", b:"6", c:"7", d:"8", correct:"C"},
+  {q:"عملة الأردن؟", a:"دينار", b:"دولار", c:"يورو", d:"ريال", correct:"A"}
  ],
+
  science: [
-  {q:"ما أكبر كوكب؟", a:"الأرض", b:"المريخ", c:"المشتري", d:"الزهرة", correct:"C"}
+  {q:"أكبر كوكب؟", a:"الأرض", b:"المريخ", c:"المشتري", d:"الزهرة", correct:"C"},
+  {q:"وحدة القوة؟", a:"نيوتن", b:"جول", c:"واط", d:"أمبير", correct:"A"},
+  {q:"عدد الكواكب؟", a:"7", b:"8", c:"9", d:"10", correct:"B"}
  ],
+
  sports: [
-  {q:"كم لاعب كرة قدم؟", a:"9", b:"10", c:"11", d:"12", correct:"C"}
+  {q:"لاعبين كرة القدم؟", a:"9", b:"10", c:"11", d:"12", correct:"C"},
+  {q:"كم شوط؟", a:"1", b:"2", c:"3", d:"4", correct:"B"},
+  {q:"مدة المباراة؟", a:"90", b:"80", c:"100", d:"70", correct:"A"}
  ]
 };
 
@@ -81,13 +156,16 @@ let questions = [];
 let timer;
 let timeLeft = 15;
 
+/* Quiz */
 function startQuiz(cat){
+ playSound();
  document.getElementById("menu").style.display="none";
  document.getElementById("quiz").style.display="block";
 
  questions = data[cat];
  current = 0;
  score = 0;
+
  loadQuestion();
  startTimer();
 }

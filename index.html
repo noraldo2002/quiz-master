@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>سين جيم Pro Voice</title>
+<title>سين جيم Voice Fix</title>
 
 <style>
 body {
@@ -51,9 +51,7 @@ width:70%;
 text-align:center;
 }
 
-#game, #menu, #result{
-display:none;
-}
+#game,#menu,#result{display:none;}
 
 #question{
 margin:20px;
@@ -64,7 +62,7 @@ font-size:18px;
 
 <body>
 
-<!-- 🚀 SPLASH -->
+<!-- 🚀 START -->
 <div id="splash">
 
 <h1>🎮 سين جيم Voice</h1>
@@ -137,9 +135,12 @@ function startApp(){
 
  document.getElementById("splash").style.display="none";
  document.getElementById("menu").style.display="block";
+
+ /* 🔥 مهم جداً لتفعيل الصوت */
+ window.speechSynthesis.getVoices();
 }
 
-/* 🎯 أسئلة */
+/* 🎯 الأسئلة */
 let data={
 general:[
 {q:"ما عاصمة الأردن؟",a:"عمان",b:"دمشق",c:"بيروت",d:"بغداد",correct:"A"}
@@ -178,8 +179,7 @@ function load(){
 
  let q=questions[current];
 
- document.getElementById("question").innerText=
- "❓ "+q.q;
+ document.getElementById("question").innerText="❓ "+q.q;
 
  document.getElementById("A").innerText=q.a;
  document.getElementById("B").innerText=q.b;
@@ -252,22 +252,34 @@ function end(){
  teamA+":"+scoreA+"\n"+teamB+":"+scoreB+"\n\n"+win;
 }
 
-/* 🔊 صوت السؤال (ستايل ساسكي بارد) */
+/* 🔊 🔥 الصوت (مضمون شغال) */
 function speakQuestion(){
 
  let q=questions[current].q;
 
- let speech=new SpeechSynthesisUtterance();
- speech.text=q;
- speech.lang="ar-SA";
+ window.speechSynthesis.cancel(); // يمنع التداخل
 
- // 🎯 ستايل صوت بارد (أنمي)
- speech.rate=0.85;
- speech.pitch=0.4;
+ let speech = new SpeechSynthesisUtterance(q);
+
+ speech.lang="ar-SA";
+ speech.rate=0.9;
+ speech.pitch=0.8;
  speech.volume=1;
+
+ let voices = window.speechSynthesis.getVoices();
+
+ if(voices.length){
+  let arabicVoice = voices.find(v => v.lang.includes("ar"));
+  if(arabicVoice) speech.voice = arabicVoice;
+ }
 
  window.speechSynthesis.speak(speech);
 }
+
+/* 🔥 تحميل الأصوات */
+window.speechSynthesis.onvoiceschanged = () => {
+ window.speechSynthesis.getVoices();
+};
 
 </script>
 

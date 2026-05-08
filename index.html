@@ -23,12 +23,8 @@ button {
 
 .category { background: #2563eb; color: white; }
 .option { background: #1e293b; color: white; }
-.correct { background: green !important; }
-.wrong { background: red !important; }
 
-#box {
-    margin-top: 50px;
-}
+#box { margin-top: 50px; }
 </style>
 </head>
 
@@ -36,7 +32,7 @@ button {
 
 <div id="box">
 
-<h2 id="title">🎮 Quiz Master</h2>
+<h2>🎮 Quiz Master</h2>
 
 <div id="menu">
     <button class="category" onclick="startQuiz('general')">معلومات عامة</button>
@@ -59,7 +55,7 @@ button {
 <div id="result" style="display:none;">
     <h2>انتهت اللعبة 🎉</h2>
     <p>نتيجتك: <span id="finalScore"></span></p>
-    <button onclick="location.reload()">إعادة اللعب</button>
+    <button onclick="location.reload()">إعادة</button>
 </div>
 
 </div>
@@ -75,4 +71,84 @@ let data = {
   {q:"ما أكبر كوكب؟", a:"الأرض", b:"المريخ", c:"المشتري", d:"الزهرة", correct:"C"}
  ],
  sports: [
-  {q:"كم
+  {q:"كم لاعب كرة قدم؟", a:"9", b:"10", c:"11", d:"12", correct:"C"}
+ ]
+};
+
+let current = 0;
+let score = 0;
+let questions = [];
+let timer;
+let timeLeft = 15;
+
+function startQuiz(cat){
+ document.getElementById("menu").style.display="none";
+ document.getElementById("quiz").style.display="block";
+
+ questions = data[cat];
+ current = 0;
+ score = 0;
+ loadQuestion();
+ startTimer();
+}
+
+function loadQuestion(){
+ let q = questions[current];
+
+ document.getElementById("question").innerText = q.q;
+ document.getElementById("A").innerText = q.a;
+ document.getElementById("B").innerText = q.b;
+ document.getElementById("C").innerText = q.c;
+ document.getElementById("D").innerText = q.d;
+
+ timeLeft = 15;
+ document.getElementById("time").innerText = timeLeft;
+}
+
+function answer(choice){
+ let q = questions[current];
+
+ if(choice == q.correct){
+  score += 10;
+  document.getElementById("score").innerText = score;
+ }
+
+ current++;
+
+ if(current >= questions.length){
+  endGame();
+ } else {
+  loadQuestion();
+ }
+}
+
+function startTimer(){
+ clearInterval(timer);
+
+ timer = setInterval(()=>{
+  timeLeft--;
+  document.getElementById("time").innerText = timeLeft;
+
+  if(timeLeft <= 0){
+    current++;
+    if(current >= questions.length){
+      endGame();
+    } else {
+      loadQuestion();
+    }
+    timeLeft = 15;
+  }
+ },1000);
+}
+
+function endGame(){
+ clearInterval(timer);
+ document.getElementById("quiz").style.display="none";
+ document.getElementById("result").style.display="block";
+ document.getElementById("finalScore").innerText = score;
+}
+
+</script>
+
+</body>
+</html>

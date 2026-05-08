@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Quiz Master</title>
+
+<style>
+body {
+    font-family: Arial;
+    text-align: center;
+    background: #0f172a;
+    color: white;
+}
+
+button {
+    padding: 12px;
+    margin: 5px;
+    width: 80%;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+.category { background: #2563eb; color: white; }
+.option { background: #1e293b; color: white; }
+.correct { background: green !important; }
+.wrong { background: red !important; }
+
+#box {
+    margin-top: 50px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="box">
+
+<h2 id="title">🎮 Quiz Master</h2>
+
+<div id="menu">
+    <button class="category" onclick="startQuiz('general')">معلومات عامة</button>
+    <button class="category" onclick="startQuiz('science')">علوم</button>
+    <button class="category" onclick="startQuiz('sports')">رياضة</button>
+</div>
+
+<div id="quiz" style="display:none;">
+    <h3 id="question"></h3>
+
+    <button class="option" onclick="answer('A')" id="A"></button>
+    <button class="option" onclick="answer('B')" id="B"></button>
+    <button class="option" onclick="answer('C')" id="C"></button>
+    <button class="option" onclick="answer('D')" id="D"></button>
+
+    <p>⏱ الوقت: <span id="time">15</span></p>
+    <p>⭐ النقاط: <span id="score">0</span></p>
+</div>
+
+<div id="result" style="display:none;">
+    <h2>انتهت اللعبة 🎉</h2>
+    <p>نتيجتك: <span id="finalScore"></span></p>
+    <button onclick="location.reload()">إعادة اللعب</button>
+</div>
+
+</div>
+
+<script>
+
+let data = {
+ general: [
+  {q:"ما عاصمة الأردن؟", a:"عمان", b:"دمشق", c:"القاهرة", d:"بغداد", correct:"A"},
+  {q:"كم عدد قارات العالم؟", a:"5", b:"6", c:"7", d:"8", correct:"C"}
+ ],
+ science: [
+  {q:"ما أكبر كوكب؟", a:"الأرض", b:"المريخ", c:"المشتري", d:"الزهرة", correct:"C"}
+ ],
+ sports: [
+  {q:"كم

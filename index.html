@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>سين جيم Pro Ultimate</title>
+<title>سين جيم Pro Voice</title>
 
 <style>
 body {
@@ -13,7 +13,6 @@ body {
     margin: 0;
 }
 
-/* Buttons */
 button {
     padding: 14px;
     margin: 6px;
@@ -23,7 +22,17 @@ button {
     font-size: 16px;
 }
 
-/* Splash */
+.category {
+    background: linear-gradient(45deg, #2563eb, #3b82f6);
+    color: white;
+}
+
+.option {
+    background: #111827;
+    border: 1px solid #334155;
+    color: white;
+}
+
 #splash {
 position:fixed;
 width:100%; height:100%;
@@ -34,7 +43,6 @@ justify-content:center;
 align-items:center;
 }
 
-/* Inputs */
 input{
 padding:10px;
 margin:5px;
@@ -43,41 +51,7 @@ width:70%;
 text-align:center;
 }
 
-/* Category Cards */
-.catGrid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-width:90%;
-margin:auto;
-}
-
-.cat{
-background:#111827;
-border:1px solid #334155;
-padding:15px;
-border-radius:15px;
-cursor:pointer;
-transition:0.3s;
-}
-
-.cat:hover{
-transform:scale(1.05);
-background:#1f2937;
-}
-
-.icon{
-font-size:30px;
-}
-
-/* Game */
-.option{
-background:#111827;
-border:1px solid #334155;
-color:white;
-}
-
-#game, #menu, #categories, #result{
+#game, #menu, #result{
 display:none;
 }
 
@@ -93,12 +67,12 @@ font-size:18px;
 <!-- 🚀 SPLASH -->
 <div id="splash">
 
-<h1>🎮 سين جيم Pro</h1>
+<h1>🎮 سين جيم Voice</h1>
 
-<input id="team1" placeholder="اسم الفريق الأول">
-<input id="team2" placeholder="اسم الفريق الثاني">
+<input id="team1" placeholder="الفريق الأول">
+<input id="team2" placeholder="الفريق الثاني">
 
-<button onclick="goMenu()" style="background:#22c55e;color:white;">
+<button onclick="startApp()" style="background:#22c55e;color:white;">
 ابدأ اللعب
 </button>
 
@@ -106,61 +80,27 @@ font-size:18px;
 
 <!-- MENU -->
 <div id="menu">
-<h2>اختر الفئة</h2>
 
-<div class="catGrid">
+<button class="category" onclick="startQuiz('general')">📚 معلومات</button>
+<button class="category" onclick="startQuiz('science')">🔬 علوم</button>
+<button class="category" onclick="startQuiz('sports')">⚽ رياضة</button>
+<button class="category" onclick="startQuiz('series')">🎬 مسلسلات</button>
 
-<div class="cat" onclick="startQuiz('general')">
-<div class="icon">📚</div>
-معلومات عامة
-</div>
-
-<div class="cat" onclick="startQuiz('science')">
-<div class="icon">🔬</div>
-علوم
-</div>
-
-<div class="cat" onclick="startQuiz('sports')">
-<div class="icon">⚽</div>
-رياضة
-</div>
-
-<div class="cat" onclick="startQuiz('series')">
-<div class="icon">🎬</div>
-مسلسلات
-</div>
-
-<div class="cat" onclick="startQuiz('hadith')">
-<div class="icon">📿</div>
-أحاديث نبوية
-</div>
-
-<div class="cat" onclick="startQuiz('players')">
-<div class="icon">🏃</div>
-لاعبين كرة قدم
-</div>
-
-<div class="cat" onclick="startQuiz('prophets')">
-<div class="icon">🕌</div>
-قصص الأنبياء
-</div>
-
-<div class="cat" onclick="startQuiz('war')">
-<div class="icon">⚔️</div>
-الحرب العالمية
-</div>
-
-</div>
 </div>
 
 <!-- GAME -->
 <div id="game">
 
-<h3 id="teams"></h3>
-
-<div>⭐ <span id="score"></span></div>
+<div>
+⭐ <span id="score"></span>
+</div>
 
 <h3 id="question"></h3>
+
+<!-- 🔊 زر الصوت -->
+<button onclick="speakQuestion()" style="background:#22c55e;color:white;">
+🔊 اقرأ السؤال
+</button>
 
 <button class="option" onclick="answer('A')" id="A"></button>
 <button class="option" onclick="answer('B')" id="B"></button>
@@ -189,47 +129,29 @@ let current=0;
 let timer;
 let timeLeft=15;
 
-/* 🚀 بداية */
-function goMenu(){
- teamA = document.getElementById("team1").value || "A";
- teamB = document.getElementById("team2").value || "B";
+/* 🚀 تشغيل */
+function startApp(){
+
+ teamA=document.getElementById("team1").value||"A";
+ teamB=document.getElementById("team2").value||"B";
 
  document.getElementById("splash").style.display="none";
  document.getElementById("menu").style.display="block";
 }
 
-/* 🎯 الأسئلة */
-let data = {
+/* 🎯 أسئلة */
+let data={
 general:[
 {q:"ما عاصمة الأردن؟",a:"عمان",b:"دمشق",c:"بيروت",d:"بغداد",correct:"A"}
 ],
-
 science:[
 {q:"أكبر كوكب؟",a:"الأرض",b:"المريخ",c:"المشتري",d:"الزهرة",correct:"C"}
 ],
-
 sports:[
 {q:"لاعبين كرة القدم؟",a:"9",b:"10",c:"11",d:"12",correct:"C"}
 ],
-
 series:[
 {q:"بطل الولادة من الخاصرة؟",a:"تيم حسن",b:"قصي خولي",c:"باسل خياط",d:"آخر",correct:"B"}
-],
-
-hadith:[
-{q:"أكمل الحديث: إنما الأعمال بالنيات...",a:"وبالصبر",b:"ولكل امرئ ما نوى",c:"والإيمان",d:"والصدق",correct:"B"}
-],
-
-players:[
-{q:"أين يلعب ميسي؟",a:"ريال مدريد",b:"إنتر ميامي",c:"باريس",d:"برشلونة",correct:"B"}
-],
-
-prophets:[
-{q:"من كفل مريم؟",a:"زكريا",b:"نوح",c:"موسى",d:"يوسف",correct:"A"}
-],
-
-war:[
-{q:"متى بدأت الحرب العالمية الثانية؟",a:"1914",b:"1939",c:"1945",d:"1920",correct:"B"}
 ]
 };
 
@@ -244,7 +166,7 @@ function startQuiz(cat){
  document.getElementById("menu").style.display="none";
  document.getElementById("game").style.display="block";
 
- questions = shuffle(data[cat]);
+ questions=shuffle(data[cat]);
  current=0;
 
  load();
@@ -256,13 +178,8 @@ function load(){
 
  let q=questions[current];
 
- document.getElementById("teams").innerText =
- teamA+" vs "+teamB;
-
- document.getElementById("score").innerText =
- teamA+":"+scoreA+" | "+teamB+":"+scoreB;
-
- document.getElementById("question").innerText="❓ "+q.q;
+ document.getElementById("question").innerText=
+ "❓ "+q.q;
 
  document.getElementById("A").innerText=q.a;
  document.getElementById("B").innerText=q.b;
@@ -271,6 +188,8 @@ function load(){
 
  timeLeft=15;
  document.getElementById("time").innerText=timeLeft;
+
+ updateScore();
 }
 
 /* 🔘 */
@@ -310,8 +229,15 @@ function startTimer(){
  },1000);
 }
 
+/* ⭐ */
+function updateScore(){
+ document.getElementById("score").innerText=
+ teamA+":"+scoreA+" | "+teamB+":"+scoreB;
+}
+
 /* 🏁 */
 function end(){
+
  clearInterval(timer);
 
  document.getElementById("game").style.display="none";
@@ -324,6 +250,23 @@ function end(){
 
  document.getElementById("final").innerText=
  teamA+":"+scoreA+"\n"+teamB+":"+scoreB+"\n\n"+win;
+}
+
+/* 🔊 صوت السؤال (ستايل ساسكي بارد) */
+function speakQuestion(){
+
+ let q=questions[current].q;
+
+ let speech=new SpeechSynthesisUtterance();
+ speech.text=q;
+ speech.lang="ar-SA";
+
+ // 🎯 ستايل صوت بارد (أنمي)
+ speech.rate=0.85;
+ speech.pitch=0.4;
+ speech.volume=1;
+
+ window.speechSynthesis.speak(speech);
 }
 
 </script>

@@ -1,139 +1,106 @@
-
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Quiz Master</title>
+<title>سين جيم - Quiz Game</title>
 
 <style>
 body {
     font-family: Arial;
     text-align: center;
-    background: #0f172a;
+    background: radial-gradient(circle, #0b1220, #05070f);
     color: white;
     margin: 0;
 }
 
-/* Loading */
-#loading {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    background: #0f172a;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 22px;
-    animation: fadeOut 2s forwards;
-}
-
-@keyframes fadeOut {
-    0% {opacity:1;}
-    100% {opacity:0; visibility:hidden;}
-}
-
-/* Start Screen */
-#startScreen {
-    margin-top: 120px;
-    animation: pop 0.8s ease;
-}
-
-@keyframes pop {
-    from {transform: scale(0.5); opacity:0;}
-    to {transform: scale(1); opacity:1;}
-}
-
+/* Buttons */
 button {
-    padding: 12px;
-    margin: 5px;
-    width: 80%;
+    padding: 14px;
+    margin: 6px;
+    width: 85%;
     border: none;
-    border-radius: 10px;
+    border-radius: 15px;
     font-size: 16px;
 }
 
-.startBtn {
-    background: #22c55e;
+.category {
+    background: linear-gradient(45deg, #2563eb, #3b82f6);
     color: white;
-    font-size: 22px;
+    font-weight: bold;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
 }
 
-.category { background: #2563eb; color: white; }
-.option { background: #1e293b; color: white; }
+.option {
+    background: #111827;
+    border: 1px solid #334155;
+    color: white;
+}
 
-#box { margin-top: 50px; }
+#container { margin-top: 30px; }
 
+/* Result */
+#result {
+    display:none;
+}
+
+/* Question */
+#question {
+    margin: 20px;
+    font-size: 18px;
+}
 </style>
 </head>
 
 <body>
 
-<!-- 🔥 Loading -->
-<div id="loading">Loading Quiz...</div>
+<h2>🎮 سين جيم</h2>
 
-<!-- 🎮 Start Screen -->
-<div id="startScreen" style="display:none;">
-    <h1>🎮 Quiz Master</h1>
-    <button class="startBtn" onclick="showMenu()">ابدأ اللعب</button>
+<div id="container">
+
+<!-- MENU -->
+<div id="menu">
+
+<button class="category" onclick="startQuiz('general')">📚 معلومات عامة</button>
+<button class="category" onclick="startQuiz('science')">🔬 علوم</button>
+<button class="category" onclick="startQuiz('sports')">⚽ رياضة</button>
+<button class="category" onclick="startQuiz('series')">🎬 مسلسلات عربية</button>
+
 </div>
 
-<div id="box">
+<!-- GAME -->
+<div id="game" style="display:none;">
 
-<!-- Menu -->
-<div id="menu" style="display:none;">
-    <button class="category" onclick="startQuiz('general')">معلومات عامة</button>
-    <button class="category" onclick="startQuiz('science')">علوم</button>
-    <button class="category" onclick="startQuiz('sports')">رياضة</button>
+<div>
+⭐ النقاط: <span id="score">0</span>
 </div>
 
-<!-- Quiz -->
-<div id="quiz" style="display:none;">
-    <h3 id="question"></h3>
+<h3 id="question"></h3>
 
-    <button class="option" onclick="answer('A')" id="A"></button>
-    <button class="option" onclick="answer('B')" id="B"></button>
-    <button class="option" onclick="answer('C')" id="C"></button>
-    <button class="option" onclick="answer('D')" id="D"></button>
+<button class="option" onclick="answer('A')" id="A"></button>
+<button class="option" onclick="answer('B')" id="B"></button>
+<button class="option" onclick="answer('C')" id="C"></button>
+<button class="option" onclick="answer('D')" id="D"></button>
 
-    <p>⏱ الوقت: <span id="time">15</span></p>
-    <p>⭐ النقاط: <span id="score">0</span></p>
+<p>⏱ الوقت: <span id="time">15</span></p>
+
 </div>
 
-<!-- Result -->
-<div id="result" style="display:none;">
-    <h2>انتهت اللعبة 🎉</h2>
-    <p>نتيجتك: <span id="finalScore"></span></p>
-    <button onclick="location.reload()">إعادة اللعب</button>
+<!-- RESULT -->
+<div id="result">
+<h2>🎉 انتهت اللعبة</h2>
+<p id="finalText"></p>
+<button onclick="location.reload()">إعادة اللعب</button>
 </div>
 
 </div>
 
 <script>
 
-/* 🎵 صوت بسيط */
-function playSound(){
-    let audio = new Audio("https://actions.google.com/sounds/v1/cartoon/pop.ogg");
-    audio.play();
-}
-
-/* بعد التحميل */
-setTimeout(()=>{
-    document.getElementById("loading").style.display="none";
-    document.getElementById("startScreen").style.display="block";
-},2000);
-
-/* Start Screen */
-function showMenu(){
-    playSound();
-    document.getElementById("startScreen").style.display="none";
-    document.getElementById("menu").style.display="block";
-}
-
-/* Data */
+/* 🎯 الأسئلة */
 let data = {
  general: [
   {q:"ما عاصمة الأردن؟", a:"عمان", b:"دمشق", c:"بيروت", d:"بغداد", correct:"A"},
-  {q:"كم قارة بالعالم؟", a:"5", b:"6", c:"7", d:"8", correct:"C"},
+  {q:"عدد قارات العالم؟", a:"5", b:"6", c:"7", d:"8", correct:"C"},
   {q:"عملة الأردن؟", a:"دينار", b:"دولار", c:"يورو", d:"ريال", correct:"A"}
  ],
 
@@ -147,33 +114,46 @@ let data = {
   {q:"لاعبين كرة القدم؟", a:"9", b:"10", c:"11", d:"12", correct:"C"},
   {q:"كم شوط؟", a:"1", b:"2", c:"3", d:"4", correct:"B"},
   {q:"مدة المباراة؟", a:"90", b:"80", c:"100", d:"70", correct:"A"}
+ ],
+
+ series: [
+  {q:"بطل الولادة من الخاصرة؟", a:"تيم حسن", b:"قصي خولي", c:"باسل خياط", d:"معتصم النهار", correct:"B"},
+  {q:"بلد التصوير؟", a:"سوريا", b:"لبنان", c:"الأردن", d:"مصر", correct:"A"},
+  {q:"نوع المسلسل؟", a:"دراما اجتماعية", b:"كوميدي", c:"أكشن", d:"رعب", correct:"A"}
  ]
 };
 
+let questions = [];
 let current = 0;
 let score = 0;
-let questions = [];
 let timer;
 let timeLeft = 15;
 
-/* Quiz */
-function startQuiz(cat){
- playSound();
- document.getElementById("menu").style.display="none";
- document.getElementById("quiz").style.display="block";
+/* 🔀 خلط */
+function shuffle(arr){
+ return arr.sort(()=>Math.random()-0.5);
+}
 
- questions = data[cat];
+/* 🎮 بدء */
+function startQuiz(cat){
+ document.getElementById("menu").style.display="none";
+ document.getElementById("game").style.display="block";
+
+ questions = shuffle(data[cat]);
  current = 0;
  score = 0;
 
+ updateScore();
  loadQuestion();
  startTimer();
 }
 
+/* ❓ سؤال */
 function loadQuestion(){
  let q = questions[current];
 
- document.getElementById("question").innerText = q.q;
+ document.getElementById("question").innerText = "❓ " + q.q;
+
  document.getElementById("A").innerText = q.a;
  document.getElementById("B").innerText = q.b;
  document.getElementById("C").innerText = q.c;
@@ -181,16 +161,26 @@ function loadQuestion(){
 
  timeLeft = 15;
  document.getElementById("time").innerText = timeLeft;
+
+ enableButtons();
 }
 
+/* 🔘 إجابة */
 function answer(choice){
  let q = questions[current];
 
+ disableButtons();
+
  if(choice == q.correct){
   score += 10;
-  document.getElementById("score").innerText = score;
+  updateScore();
  }
 
+ setTimeout(nextQuestion, 700);
+}
+
+/* ⏭ التالي */
+function nextQuestion(){
  current++;
 
  if(current >= questions.length){
@@ -200,6 +190,7 @@ function answer(choice){
  }
 }
 
+/* ⏱ Timer */
 function startTimer(){
  clearInterval(timer);
 
@@ -208,22 +199,48 @@ function startTimer(){
   document.getElementById("time").innerText = timeLeft;
 
   if(timeLeft <= 0){
-    current++;
-    if(current >= questions.length){
-      endGame();
-    } else {
-      loadQuestion();
-    }
-    timeLeft = 15;
+    nextQuestion();
   }
  },1000);
 }
 
+/* ⭐ تحديث النقاط */
+function updateScore(){
+ document.getElementById("score").innerText = score;
+}
+
+/* 🔒 أزرار */
+function disableButtons(){
+ ["A","B","C","D"].forEach(id=>{
+  document.getElementById(id).disabled = true;
+ });
+}
+
+function enableButtons(){
+ ["A","B","C","D"].forEach(id=>{
+  document.getElementById(id).disabled = false;
+ });
+}
+
+/* 🏁 نهاية */
 function endGame(){
  clearInterval(timer);
- document.getElementById("quiz").style.display="none";
+
+ document.getElementById("game").style.display="none";
  document.getElementById("result").style.display="block";
- document.getElementById("finalScore").innerText = score;
+
+ let text = "";
+
+ if(score >= 80){
+  text = "🔥 ممتاز جداً - أنت بطل سين جيم";
+ } else if(score >= 50){
+  text = "👍 جيد جداً";
+ } else {
+  text = "😐 حاول مرة أخرى";
+ }
+
+ document.getElementById("finalText").innerText =
+ "⭐ نقاطك: " + score + "\n" + text;
 }
 
 </script>

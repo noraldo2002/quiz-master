@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>سين جيم Voice Fix</title>
+<title>سين جيم Pro Ultimate</title>
 
 <style>
 body {
@@ -62,10 +62,14 @@ font-size:18px;
 
 <body>
 
-<!-- 🚀 START -->
+<!-- 🔊 AUDIO SYSTEM -->
+<audio id="bgMusic" loop></audio>
+<audio id="fx"></audio>
+
+<!-- 🚀 SPLASH -->
 <div id="splash">
 
-<h1>🎮 سين جيم Voice</h1>
+<h1>🎮 سين جيم Pro</h1>
 
 <input id="team1" placeholder="الفريق الأول">
 <input id="team2" placeholder="الفريق الثاني">
@@ -94,11 +98,6 @@ font-size:18px;
 </div>
 
 <h3 id="question"></h3>
-
-<!-- 🔊 زر الصوت -->
-<button onclick="speakQuestion()" style="background:#22c55e;color:white;">
-🔊 اقرأ السؤال
-</button>
 
 <button class="option" onclick="answer('A')" id="A"></button>
 <button class="option" onclick="answer('B')" id="B"></button>
@@ -136,11 +135,45 @@ function startApp(){
  document.getElementById("splash").style.display="none";
  document.getElementById("menu").style.display="block";
 
- /* 🔥 مهم جداً لتفعيل الصوت */
- window.speechSynthesis.getVoices();
+ // 🎵 موسيقى الخلفية
+ let bg = document.getElementById("bgMusic");
+ bg.src = "voice/bg.mp3";
+ bg.volume = 0.3;
+ bg.play();
 }
 
-/* 🎯 الأسئلة */
+/* 🎧 صوت */
+function playSound(type){
+
+ let fx = document.getElementById("fx");
+
+ switch(type){
+
+  case "click":
+   fx.src = "voice/click.mp3";
+   break;
+
+  case "correct":
+   fx.src = "voice/correct.mp3";
+   break;
+
+  case "wrong":
+   fx.src = "voice/wrong.mp3";
+   break;
+
+  case "question":
+   fx.src = "voice/question.mp3";
+   break;
+
+  case "win":
+   fx.src = "voice/win.mp3";
+   break;
+ }
+
+ fx.play();
+}
+
+/* 🎯 أسئلة */
 let data={
 general:[
 {q:"ما عاصمة الأردن؟",a:"عمان",b:"دمشق",c:"بيروت",d:"بغداد",correct:"A"}
@@ -177,6 +210,8 @@ function startQuiz(cat){
 /* ❓ */
 function load(){
 
+ playSound("question");
+
  let q=questions[current];
 
  document.getElementById("question").innerText="❓ "+q.q;
@@ -188,18 +223,23 @@ function load(){
 
  timeLeft=15;
  document.getElementById("time").innerText=timeLeft;
-
- updateScore();
 }
 
 /* 🔘 */
 function answer(choice){
 
+ playSound("click");
+
  let q=questions[current];
 
  if(choice==q.correct){
+  playSound("correct");
+
   if(turn=="A") scoreA+=10;
   else scoreB+=10;
+
+ } else {
+  playSound("wrong");
  }
 
  turn=(turn=="A")?"B":"A";
@@ -238,6 +278,8 @@ function updateScore(){
 /* 🏁 */
 function end(){
 
+ playSound("win");
+
  clearInterval(timer);
 
  document.getElementById("game").style.display="none";
@@ -251,35 +293,6 @@ function end(){
  document.getElementById("final").innerText=
  teamA+":"+scoreA+"\n"+teamB+":"+scoreB+"\n\n"+win;
 }
-
-/* 🔊 🔥 الصوت (مضمون شغال) */
-function speakQuestion(){
-
- let q=questions[current].q;
-
- window.speechSynthesis.cancel(); // يمنع التداخل
-
- let speech = new SpeechSynthesisUtterance(q);
-
- speech.lang="ar-SA";
- speech.rate=0.9;
- speech.pitch=0.8;
- speech.volume=1;
-
- let voices = window.speechSynthesis.getVoices();
-
- if(voices.length){
-  let arabicVoice = voices.find(v => v.lang.includes("ar"));
-  if(arabicVoice) speech.voice = arabicVoice;
- }
-
- window.speechSynthesis.speak(speech);
-}
-
-/* 🔥 تحميل الأصوات */
-window.speechSynthesis.onvoiceschanged = () => {
- window.speechSynthesis.getVoices();
-};
 
 </script>
 

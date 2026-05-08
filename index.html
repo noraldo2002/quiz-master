@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>سين جيم - Pro Game</title>
+<title>سين جيم Pro Ultimate</title>
 
 <style>
 body {
@@ -13,6 +13,7 @@ body {
     margin: 0;
 }
 
+/* Buttons */
 button {
     padding: 14px;
     margin: 6px;
@@ -22,24 +23,9 @@ button {
     font-size: 16px;
 }
 
-.category {
-    background: linear-gradient(45deg, #2563eb, #3b82f6);
-    color: white;
-    font-weight: bold;
-}
-
-.option {
-    background: #111827;
-    border: 1px solid #334155;
-    color: white;
-}
-
-#container { margin-top: 30px; }
-
 /* Splash */
-#splashScreen{
+#splash {
 position:fixed;
-top:0; left:0;
 width:100%; height:100%;
 background:#05070f;
 display:flex;
@@ -48,62 +34,131 @@ justify-content:center;
 align-items:center;
 }
 
+/* Inputs */
 input{
 padding:10px;
 margin:5px;
 border-radius:10px;
-text-align:center;
 width:70%;
+text-align:center;
 }
 
-/* Result */
-#result { display:none; }
+/* Category Cards */
+.catGrid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+width:90%;
+margin:auto;
+}
 
-#question {
-    margin: 20px;
-    font-size: 18px;
+.cat{
+background:#111827;
+border:1px solid #334155;
+padding:15px;
+border-radius:15px;
+cursor:pointer;
+transition:0.3s;
+}
+
+.cat:hover{
+transform:scale(1.05);
+background:#1f2937;
+}
+
+.icon{
+font-size:30px;
+}
+
+/* Game */
+.option{
+background:#111827;
+border:1px solid #334155;
+color:white;
+}
+
+#game, #menu, #categories, #result{
+display:none;
+}
+
+#question{
+margin:20px;
+font-size:18px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- 🚀 START SCREEN -->
-<div id="splashScreen">
+<!-- 🚀 SPLASH -->
+<div id="splash">
 
 <h1>🎮 سين جيم Pro</h1>
-
-<input id="playerName" placeholder="اسم اللاعب">
 
 <input id="team1" placeholder="اسم الفريق الأول">
 <input id="team2" placeholder="اسم الفريق الثاني">
 
-<button onclick="startApp()" style="background:#22c55e; color:white;">
-ابدأ التحدي 🔥
+<button onclick="goMenu()" style="background:#22c55e;color:white;">
+ابدأ اللعب
 </button>
 
 </div>
 
-<h2>🎮 سين جيم</h2>
-
-<div id="container">
-
 <!-- MENU -->
-<div id="menu" style="display:none;">
+<div id="menu">
+<h2>اختر الفئة</h2>
 
-<button class="category" onclick="startQuiz('general')">📚 معلومات عامة</button>
-<button class="category" onclick="startQuiz('science')">🔬 علوم</button>
-<button class="category" onclick="startQuiz('sports')">⚽ رياضة</button>
-<button class="category" onclick="startQuiz('series')">🎬 مسلسلات</button>
+<div class="catGrid">
 
+<div class="cat" onclick="startQuiz('general')">
+<div class="icon">📚</div>
+معلومات عامة
+</div>
+
+<div class="cat" onclick="startQuiz('science')">
+<div class="icon">🔬</div>
+علوم
+</div>
+
+<div class="cat" onclick="startQuiz('sports')">
+<div class="icon">⚽</div>
+رياضة
+</div>
+
+<div class="cat" onclick="startQuiz('series')">
+<div class="icon">🎬</div>
+مسلسلات
+</div>
+
+<div class="cat" onclick="startQuiz('hadith')">
+<div class="icon">📿</div>
+أحاديث نبوية
+</div>
+
+<div class="cat" onclick="startQuiz('players')">
+<div class="icon">🏃</div>
+لاعبين كرة قدم
+</div>
+
+<div class="cat" onclick="startQuiz('prophets')">
+<div class="icon">🕌</div>
+قصص الأنبياء
+</div>
+
+<div class="cat" onclick="startQuiz('war')">
+<div class="icon">⚔️</div>
+الحرب العالمية
+</div>
+
+</div>
 </div>
 
 <!-- GAME -->
-<div id="game" style="display:none;">
+<div id="game">
 
-<div>
-⭐ <span id="score">0</span>
-</div>
+<h3 id="teams"></h3>
+
+<div>⭐ <span id="score"></span></div>
 
 <h3 id="question"></h3>
 
@@ -112,211 +167,163 @@ width:70%;
 <button class="option" onclick="answer('C')" id="C"></button>
 <button class="option" onclick="answer('D')" id="D"></button>
 
-<p>⏱ الوقت: <span id="time">15</span></p>
+<p>⏱ <span id="time">15</span></p>
 
 </div>
 
 <!-- RESULT -->
 <div id="result">
 <h2>🎉 انتهت اللعبة</h2>
-<p id="finalText"></p>
-<button onclick="location.reload()">إعادة اللعب</button>
-</div>
-
+<p id="final"></p>
+<button onclick="location.reload()">إعادة</button>
 </div>
 
 <script>
 
-let player = "";
-let teamA = "A";
-let teamB = "B";
+let teamA, teamB;
+let scoreA=0, scoreB=0;
+let turn="A";
 
-let scoreA = 0;
-let scoreB = 0;
-
-let turn = "A";
-let comboA = 0;
-let comboB = 0;
-
-let questions = [];
-let current = 0;
+let questions=[];
+let current=0;
 let timer;
-let timeLeft = 15;
+let timeLeft=15;
 
-/* 🚀 تشغيل */
-function startApp(){
+/* 🚀 بداية */
+function goMenu(){
+ teamA = document.getElementById("team1").value || "A";
+ teamB = document.getElementById("team2").value || "B";
 
- player = document.getElementById("playerName").value;
-
- teamA = document.getElementById("team1").value || "الفريق 1";
- teamB = document.getElementById("team2").value || "الفريق 2";
-
- document.getElementById("splashScreen").style.display="none";
+ document.getElementById("splash").style.display="none";
  document.getElementById("menu").style.display="block";
 }
 
 /* 🎯 الأسئلة */
 let data = {
- general: [
-  {q:"ما عاصمة الأردن؟", a:"عمان", b:"دمشق", c:"بيروت", d:"بغداد", correct:"A"},
-  {q:"عدد القارات؟", a:"5", b:"6", c:"7", d:"8", correct:"C"}
- ],
+general:[
+{q:"ما عاصمة الأردن؟",a:"عمان",b:"دمشق",c:"بيروت",d:"بغداد",correct:"A"}
+],
 
- science: [
-  {q:"أكبر كوكب؟", a:"الأرض", b:"المريخ", c:"المشتري", d:"الزهرة", correct:"C"},
-  {q:"وحدة القوة؟", a:"نيوتن", b:"جول", c:"واط", d:"أمبير", correct:"A"}
- ],
+science:[
+{q:"أكبر كوكب؟",a:"الأرض",b:"المريخ",c:"المشتري",d:"الزهرة",correct:"C"}
+],
 
- sports: [
-  {q:"لاعبين كرة القدم؟", a:"9", b:"10", c:"11", d:"12", correct:"C"},
-  {q:"مدة المباراة؟", a:"90", b:"80", c:"100", d:"70", correct:"A"}
- ],
+sports:[
+{q:"لاعبين كرة القدم؟",a:"9",b:"10",c:"11",d:"12",correct:"C"}
+],
 
- series: [
-  {q:"بطل الولادة من الخاصرة؟", a:"تيم حسن", b:"قصي خولي", c:"باسل خياط", d:"معتصم النهار", correct:"B"},
-  {q:"نوع المسلسل؟", a:"دراما", b:"كوميدي", c:"أكشن", d:"رعب", correct:"A"}
- ]
+series:[
+{q:"بطل الولادة من الخاصرة؟",a:"تيم حسن",b:"قصي خولي",c:"باسل خياط",d:"آخر",correct:"B"}
+],
+
+hadith:[
+{q:"أكمل الحديث: إنما الأعمال بالنيات...",a:"وبالصبر",b:"ولكل امرئ ما نوى",c:"والإيمان",d:"والصدق",correct:"B"}
+],
+
+players:[
+{q:"أين يلعب ميسي؟",a:"ريال مدريد",b:"إنتر ميامي",c:"باريس",d:"برشلونة",correct:"B"}
+],
+
+prophets:[
+{q:"من كفل مريم؟",a:"زكريا",b:"نوح",c:"موسى",d:"يوسف",correct:"A"}
+],
+
+war:[
+{q:"متى بدأت الحرب العالمية الثانية؟",a:"1914",b:"1939",c:"1945",d:"1920",correct:"B"}
+]
 };
 
-/* 🔀 خلط */
+/* 🔀 */
 function shuffle(arr){
  return arr.sort(()=>Math.random()-0.5);
 }
 
-/* 🎮 بدء */
+/* 🎮 */
 function startQuiz(cat){
+
  document.getElementById("menu").style.display="none";
  document.getElementById("game").style.display="block";
 
  questions = shuffle(data[cat]);
- current = 0;
+ current=0;
 
- loadQuestion();
+ load();
  startTimer();
 }
 
-/* ❓ سؤال */
-function loadQuestion(){
+/* ❓ */
+function load(){
 
- let q = questions[current];
+ let q=questions[current];
 
- document.getElementById("question").innerText =
- "❓ " + q.q + " ("+(current+1)+"/"+questions.length+")";
+ document.getElementById("teams").innerText =
+ teamA+" vs "+teamB;
 
- document.getElementById("A").innerText = q.a;
- document.getElementById("B").innerText = q.b;
- document.getElementById("C").innerText = q.c;
- document.getElementById("D").innerText = q.d;
+ document.getElementById("score").innerText =
+ teamA+":"+scoreA+" | "+teamB+":"+scoreB;
 
- timeLeft = 15;
- document.getElementById("time").innerText = timeLeft;
+ document.getElementById("question").innerText="❓ "+q.q;
 
- enableButtons();
+ document.getElementById("A").innerText=q.a;
+ document.getElementById("B").innerText=q.b;
+ document.getElementById("C").innerText=q.c;
+ document.getElementById("D").innerText=q.d;
+
+ timeLeft=15;
+ document.getElementById("time").innerText=timeLeft;
 }
 
-/* 🔘 إجابة */
+/* 🔘 */
 function answer(choice){
 
- let q = questions[current];
+ let q=questions[current];
 
- disableButtons();
- clearInterval(timer);
-
- let correct = (choice == q.correct);
-
- if(correct){
-
-  if(turn === "A"){
-   comboA++;
-   scoreA += 10 + (comboA * 2);
-  } else {
-   comboB++;
-   scoreB += 10 + (comboB * 2);
-  }
-
- } else {
-  if(turn === "A") comboA = 0;
-  else comboB = 0;
+ if(choice==q.correct){
+  if(turn=="A") scoreA+=10;
+  else scoreB+=10;
  }
 
- turn = (turn === "A") ? "B" : "A";
-
- updateScore();
-
- setTimeout(nextQuestion, 600);
-}
-
-/* ⏭ التالي */
-function nextQuestion(){
+ turn=(turn=="A")?"B":"A";
 
  current++;
 
- if(current >= questions.length){
-  endGame();
- } else {
-  loadQuestion();
-  startTimer();
+ if(current>=questions.length){
+  end();
+ }else{
+  load();
  }
 }
 
-/* ⏱ Timer */
+/* ⏱ */
 function startTimer(){
-
  clearInterval(timer);
 
- timer = setInterval(()=>{
-
+ timer=setInterval(()=>{
   timeLeft--;
-  document.getElementById("time").innerText = timeLeft;
+  document.getElementById("time").innerText=timeLeft;
 
-  if(timeLeft <= 0){
-    nextQuestion();
+  if(timeLeft<=0){
+    current++;
+    if(current>=questions.length) end();
+    else load();
   }
-
  },1000);
 }
 
-/* ⭐ نقاط */
-function updateScore(){
- document.getElementById("score").innerText =
- teamA + ":" + scoreA + " | " + teamB + ":" + scoreB;
-}
-
-/* 🔒 أزرار */
-function disableButtons(){
- ["A","B","C","D"].forEach(id=>{
-  document.getElementById(id).disabled = true;
- });
-}
-
-function enableButtons(){
- ["A","B","C","D"].forEach(id=>{
-  document.getElementById(id).disabled = false;
- });
-}
-
-/* 🏁 نهاية */
-function endGame(){
-
+/* 🏁 */
+function end(){
  clearInterval(timer);
 
  document.getElementById("game").style.display="none";
  document.getElementById("result").style.display="block";
 
- let winner = "";
+ let win="تعادل";
 
- if(scoreA > scoreB) winner = "🏆 " + teamA + " فاز";
- else if(scoreB > scoreA) winner = "🏆 " + teamB + " فاز";
- else winner = "🤝 تعادل";
+ if(scoreA>scoreB) win=teamA+" فاز 🏆";
+ else if(scoreB>scoreA) win=teamB+" فاز 🏆";
 
- document.getElementById("finalText").innerText =
- "👤 اللاعب: " + player +
- "\n\n" +
- teamA + ": " + scoreA +
- "\n" +
- teamB + ": " + scoreB +
- "\n\n" +
- winner;
+ document.getElementById("final").innerText=
+ teamA+":"+scoreA+"\n"+teamB+":"+scoreB+"\n\n"+win;
 }
 
 </script>

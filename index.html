@@ -38,27 +38,58 @@ button {
 
 #container { margin-top: 30px; }
 
-/* Result */
-#result {
-    display:none;
+/* Splash */
+#splashScreen{
+position:fixed;
+top:0; left:0;
+width:100%; height:100%;
+background:#05070f;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
 }
+
+/* Result */
+#result { display:none; }
 
 /* Question */
 #question {
     margin: 20px;
     font-size: 18px;
 }
+
+input {
+    padding:10px;
+    border-radius:10px;
+    text-align:center;
+    font-size:16px;
+    width:70%;
+}
 </style>
 </head>
 
 <body>
+
+<!-- 🚀 SPLASH -->
+<div id="splashScreen">
+
+<h1>🎮 سين جيم</h1>
+
+<input id="playerName" placeholder="اكتب اسمك">
+
+<button onclick="startApp()" style="background:#22c55e; color:white;">
+ابدأ اللعب
+</button>
+
+</div>
 
 <h2>🎮 سين جيم</h2>
 
 <div id="container">
 
 <!-- MENU -->
-<div id="menu">
+<div id="menu" style="display:none;">
 
 <button class="category" onclick="startQuiz('general')">📚 معلومات عامة</button>
 <button class="category" onclick="startQuiz('science')">🔬 علوم</button>
@@ -95,6 +126,21 @@ button {
 </div>
 
 <script>
+
+let player = "";
+
+/* 🚀 تشغيل التطبيق */
+function startApp(){
+ player = document.getElementById("playerName").value;
+
+ if(player == ""){
+  alert("اكتب اسمك أولاً");
+  return;
+ }
+
+ document.getElementById("splashScreen").style.display="none";
+ document.getElementById("menu").style.display="block";
+}
 
 /* 🎯 الأسئلة */
 let data = {
@@ -152,7 +198,8 @@ function startQuiz(cat){
 function loadQuestion(){
  let q = questions[current];
 
- document.getElementById("question").innerText = "❓ " + q.q;
+ document.getElementById("question").innerText =
+ "❓ " + q.q + " (" + (current+1) + "/" + questions.length + ")";
 
  document.getElementById("A").innerText = q.a;
  document.getElementById("B").innerText = q.b;
@@ -176,7 +223,8 @@ function answer(choice){
   updateScore();
  }
 
- setTimeout(nextQuestion, 700);
+ clearInterval(timer);
+ setTimeout(nextQuestion, 600);
 }
 
 /* ⏭ التالي */
@@ -187,6 +235,7 @@ function nextQuestion(){
   endGame();
  } else {
   loadQuestion();
+  startTimer();
  }
 }
 
@@ -204,7 +253,7 @@ function startTimer(){
  },1000);
 }
 
-/* ⭐ تحديث النقاط */
+/* ⭐ نقاط */
 function updateScore(){
  document.getElementById("score").innerText = score;
 }
@@ -229,18 +278,20 @@ function endGame(){
  document.getElementById("game").style.display="none";
  document.getElementById("result").style.display="block";
 
- let text = "";
+ let grade = "";
 
  if(score >= 80){
-  text = "🔥 ممتاز جداً - أنت بطل سين جيم";
+  grade = "🔥 أسطورة سين جيم";
  } else if(score >= 50){
-  text = "👍 جيد جداً";
+  grade = "👍 لاعب جيد";
  } else {
-  text = "😐 حاول مرة أخرى";
+  grade = "😐 حاول مرة أخرى";
  }
 
  document.getElementById("finalText").innerText =
- "⭐ نقاطك: " + score + "\n" + text;
+ "👤 اللاعب: " + player +
+ "\n⭐ النقاط: " + score +
+ "\n🏆 " + grade;
 }
 
 </script>

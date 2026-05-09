@@ -1,148 +1,300 @@
 <!DOCTYPE html>
 <html lang="ar">
+
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>لعبة كرة القدم</title>
 
 <style>
-body {
-  font-family: Arial;
-  text-align: center;
-  direction: rtl;
-  background: #111;
-  color: white;
+
+body{
+    margin:0;
+    font-family:Arial;
+    background:#111;
+    color:white;
+    direction:rtl;
+    text-align:center;
 }
 
-.screen { display: none; padding: 20px; }
-.active { display: block; }
-
-button {
-  padding: 12px 20px;
-  margin: 10px;
-  font-size: 18px;
-  border-radius: 10px;
-  border: none;
-  cursor: pointer;
+.screen{
+    display:none;
+    padding:20px;
 }
 
-.big {
-  font-size: 24px;
-  background: red;
-  color: white;
+.active{
+    display:block;
 }
 
-.card {
-  background: #333;
-  padding: 20px;
-  margin: 10px;
-  display: inline-block;
-  width: 150px;
-  border-radius: 10px;
+button{
+    padding:15px 25px;
+    margin:10px;
+    border:none;
+    border-radius:12px;
+    font-size:20px;
+    cursor:pointer;
 }
+
+.start-btn{
+    background:red;
+    color:white;
+    font-size:28px;
+}
+
+.card{
+    background:#222;
+    width:220px;
+    margin:15px auto;
+    padding:20px;
+    border-radius:15px;
+    font-size:22px;
+}
+
+input{
+    padding:12px;
+    width:250px;
+    margin:10px;
+    border-radius:10px;
+    border:none;
+    font-size:18px;
+}
+
+#answerBox{
+    margin-top:30px;
+}
+
 </style>
-
 </head>
 
 <body>
 
-<!-- 🟢 البداية -->
+<!-- البداية -->
+
 <div id="startScreen" class="screen active">
-  <h1>🔥 لعبة كرة القدم 🔥</h1>
-  <button class="big" onclick="goTeams()">ابدأ الطحن</button>
+
+    <h1>🔥 لعبة كرة القدم 🔥</h1>
+
+    <button class="start-btn" onclick="goTeams()">
+        ابدأ الطحن
+    </button>
+
 </div>
 
-<!-- 🟡 الفرق -->
+<!-- الفرق -->
+
 <div id="teamScreen" class="screen">
-  <h2>أدخل أسماء الفرق</h2>
-  <input id="t1" placeholder="الفريق الأول"><br>
-  <input id="t2" placeholder="الفريق الثاني"><br>
-  <button onclick="goCategories()">متابعة</button>
+
+    <h1>⚽ أدخل أسماء الفرق</h1>
+
+    <input id="team1" placeholder="الفريق الأول">
+
+    <br>
+
+    <input id="team2" placeholder="الفريق الثاني">
+
+    <br>
+
+    <button onclick="goCategories()">
+        متابعة
+    </button>
+
 </div>
 
-<!-- 🔵 الفئات -->
+<!-- الفئات -->
+
 <div id="categoryScreen" class="screen">
-  <h1>⚽ كرة القدم</h1>
 
-  <div class="card" onclick="selectCat('أرقام لاعبين')">أرقام لاعبين</div>
-  <div class="card" onclick="selectCat('أسماء لاعبين')">أسماء لاعبين</div>
-  <div class="card" onclick="selectCat('كرة قدم عالمية')">كرة عالمية</div>
-  <div class="card" onclick="selectCat('من هو اللاعب')">من هو اللاعب</div>
+    <h1>⚽ فئات كرة القدم</h1>
+
+    <div class="card" onclick="selectCategory('أرقام لاعبين')">
+        أرقام لاعبين
+    </div>
+
+    <div class="card" onclick="selectCategory('أسماء لاعبين')">
+        أسماء لاعبين
+    </div>
+
+    <div class="card" onclick="selectCategory('كرة قدم عالمية')">
+        كرة قدم عالمية
+    </div>
+
+    <div class="card" onclick="selectCategory('من هو اللاعب')">
+        من هو اللاعب
+    </div>
+
 </div>
 
-<!-- 🟣 السؤال -->
+<!-- شاشة السؤال -->
+
 <div id="gameScreen" class="screen"></div>
 
 <script>
 
-function show(id){
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+// التنقل بين الشاشات
+
+function showScreen(id){
+
+    document.querySelectorAll('.screen')
+    .forEach(screen => screen.classList.remove('active'));
+
+    document.getElementById(id)
+    .classList.add('active');
+
 }
 
-// 🟢 الانتقال
-function goTeams(){ show('teamScreen'); }
+// البداية
+
+function goTeams(){
+    showScreen('teamScreen');
+}
+
+// الفئات
 
 function goCategories(){
-  if(!t1.value || !t2.value){
-    alert("اكتب أسماء الفرق");
-    return;
-  }
-  show('categoryScreen');
+
+    let t1 = document.getElementById("team1").value;
+    let t2 = document.getElementById("team2").value;
+
+    if(t1 == "" || t2 == ""){
+        alert("اكتب أسماء الفرق");
+        return;
+    }
+
+    showScreen('categoryScreen');
+
 }
 
-// ⚽ الأسئلة الحقيقية
-let data = {
-  "أرقام لاعبين": [
-    {q:"رقم ميسي؟", a:["7","10","9","11"], c:1},
-    {q:"رقم رونالدو؟", a:["7","10","11","9"], c:0}
-  ],
-  "أسماء لاعبين": [
-    {q:"صاحب رقم 10 الأرجنتين؟", a:["ميسي","رونالدو","نيمار","صلاح"], c:0}
-  ],
-  "كرة قدم عالمية": [
-    {q:"كأس العالم 2022؟", a:["قطر","البرازيل","ألمانيا","فرنسا"], c:0}
-  ],
-  "من هو اللاعب": [
-    {q:"الدون؟", a:["رونالدو","ميسي","نيمار","صلاح"], c:0}
-  ]
+// الأسئلة
+
+let questions = {
+
+"أرقام لاعبين":[
+
+{q:"ما رقم ليونيل ميسي؟", answer:"10"},
+{q:"ما رقم كريستيانو رونالدو؟", answer:"7"},
+{q:"ما رقم محمد صلاح؟", answer:"11"},
+{q:"ما رقم نيمار؟", answer:"10"},
+{q:"ما رقم مبابي؟", answer:"7"},
+{q:"ما رقم مودريتش؟", answer:"10"},
+{q:"ما رقم بنزيما؟", answer:"9"},
+{q:"ما رقم هالاند؟", answer:"9"},
+{q:"ما رقم دي بروين؟", answer:"17"},
+{q:"ما رقم فينيسيوس؟", answer:"7"}
+
+],
+
+"أسماء لاعبين":[
+
+{q:"من لاعب برشلونة والأرجنتين الأسطوري؟", answer:"ليونيل ميسي"},
+{q:"من نجم البرتغال؟", answer:"كريستيانو رونالدو"},
+{q:"من الفرعون المصري؟", answer:"محمد صلاح"},
+{q:"من لاعب فرنسا السريع؟", answer:"كيليان مبابي"},
+{q:"من أسطورة البرازيل؟", answer:"بيليه"}
+
+],
+
+"كرة قدم عالمية":[
+
+{q:"أين أقيم كأس العالم 2022؟", answer:"قطر"},
+{q:"من أكثر منتخب فاز بكأس العالم؟", answer:"البرازيل"},
+{q:"كم عدد لاعبي كرة القدم؟", answer:"11"},
+{q:"ما النادي الملكي؟", answer:"ريال مدريد"},
+{q:"ما النادي الملقب بالشياطين الحمر؟", answer:"مانشستر يونايتد"}
+
+],
+
+"من هو اللاعب":[
+
+{q:"من هو اللاعب الملقب بالدون؟", answer:"كريستيانو رونالدو"},
+{q:"من هو البرغوث؟", answer:"ليونيل ميسي"},
+{q:"من هو الجوهرة السوداء؟", answer:"بيليه"},
+{q:"من هو الفرعون المصري؟", answer:"محمد صلاح"},
+{q:"من هو اللاعب الفرنسي السريع؟", answer:"مبابي"}
+
+]
+
 };
 
-let cat = "";
-let i = 0;
+// المتغيرات
 
-function selectCat(c){
-  cat = c;
-  i = 0;
-  showGame();
+let currentCategory = "";
+let currentQuestion = 0;
+
+// اختيار الفئة
+
+function selectCategory(category){
+
+    currentCategory = category;
+
+    currentQuestion = 0;
+
+    showQuestion();
+
 }
 
-function showGame(){
-  let q = data[cat][i];
+// عرض السؤال
 
-  document.getElementById("gameScreen").innerHTML = `
-    <h2>${cat}</h2>
-    <h3>${q.q}</h3>
-    ${q.a.map((x, idx)=>`
-      <button onclick="answer(${idx})">${x}</button>
-    `).join("")}
-  `;
+function showQuestion(){
 
-  show('gameScreen');
+    let q = questions[currentCategory][currentQuestion];
+
+    document.getElementById("gameScreen").innerHTML = `
+
+        <h1>${currentCategory}</h1>
+
+        <h2>${q.q}</h2>
+
+        <button onclick="showAnswer()">
+            إظهار الإجابة
+        </button>
+
+        <div id="answerBox"></div>
+
+    `;
+
+    showScreen("gameScreen");
+
 }
 
-function answer(x){
-  let q = data[cat][i];
+// إظهار الإجابة
 
-  alert(x === q.c ? "صح ✔️" : "غلط ❌");
+function showAnswer(){
 
-  i++;
+    let q = questions[currentCategory][currentQuestion];
 
-  if(i < data[cat].length){
-    showGame();
-  } else {
-    alert("خلصت الفئة");
-    show('categoryScreen');
-  }
+    document.getElementById("answerBox").innerHTML = `
+
+        <h2>✅ الإجابة:</h2>
+
+        <h1>${q.answer}</h1>
+
+        <button onclick="nextQuestion()">
+            السؤال التالي
+        </button>
+
+    `;
+
+}
+
+// السؤال التالي
+
+function nextQuestion(){
+
+    currentQuestion++;
+
+    if(currentQuestion < questions[currentCategory].length){
+
+        showQuestion();
+
+    }else{
+
+        alert("🎉 خلصت الفئة");
+
+        showScreen("categoryScreen");
+
+    }
+
 }
 
 </script>

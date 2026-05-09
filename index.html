@@ -40,7 +40,7 @@ input{
 
 .jeopardy-board{
     display:grid;
-    grid-template-columns:repeat(6,1fr);
+    grid-template-columns:repeat(4,1fr);
     gap:10px;
     margin-top:20px;
 }
@@ -62,7 +62,7 @@ input{
     width:100%;
     background:#1565c0;
     color:white;
-    font-size:20px;
+    font-size:18px;
 }
 
 .point-btn:disabled{background:#333;}
@@ -97,7 +97,7 @@ input{
 <h1>⚔️ أدخل أسماء الفرق</h1>
 <input id="team1" placeholder="الفريق الأول"><br>
 <input id="team2" placeholder="الفريق الثاني"><br>
-<button onclick="goCategorySelect()">متابعة</button>
+<button onclick="showScreen('categorySelectScreen')">متابعة</button>
 </div>
 
 <!-- الفئات -->
@@ -109,7 +109,7 @@ input{
 <!-- السؤال -->
 <div id="gameScreen" class="screen"></div>
 
-<!-- 🏆 شاشة النهاية -->
+<!-- النهاية -->
 <div id="endScreen" class="screen"></div>
 
 <script>
@@ -124,50 +124,51 @@ let currentCategory="";
 let currentQuestion=0;
 let currentPoints=0;
 
+let timer;
 let time=15;
-let timerInterval;
 
 // ===== الأسئلة =====
 let questions={
-"معلومات عامة":[
+"معلومات":[
 {q:"ما عاصمة الأردن؟",answer:"عمان"},
-{q:"كم قارة؟",answer:"7"},
-{q:"أكبر محيط؟",answer:"الهادئ"}
+{q:"كم قارة؟",answer:"7"}
 ],
-"قصص انبياء":[
+"قصص":[
 {q:"من النبي الذي ابتلعه الحوت؟",answer:"يونس"},
-{q:"من كلم الله؟",answer:"موسى"},
-{q:"من بنى السفينة؟",answer:"نوح"}
+{q:"من كلم الله؟",answer:"موسى"}
+],
+"رتب":[
+{q:"رتب: ل م ع",answer:"علم"},
+{q:"رتب: ك ت ب",answer:"كتب"}
+],
+"عام":[
+{q:"أكبر محيط؟",answer:"الهادئ"},
+{q:"كم عدد أيام السنة؟",answer:"365"}
 ]
 };
 
-// ===== شاشة =====
+// ===== عرض شاشة =====
 function showScreen(id){
 document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
 document.getElementById(id).classList.add('active');
 }
 
-// ===== اختيار الفئات =====
-function goCategorySelect(){
-
-team1Name=document.getElementById("team1").value;
-team2Name=document.getElementById("team2").value;
-
+// ===== اختيار فئات =====
 let cats=Object.keys(questions);
 
-let html="<h1>اختار الفئات</h1>";
+let html="<h2>اختار الفئات</h2>";
 
 cats.forEach(cat=>{
 html+=`<button onclick="toggleCategory(this,'${cat}')">${cat}</button>`;
 });
 
-html+=`<br><button onclick="startGame()">ابدأ</button>`;
+html+=`<br><button onclick="startGame()">ابدأ اللعب</button>`;
 
 document.getElementById("categorySelectScreen").innerHTML=html;
-showScreen("categorySelectScreen");
-}
 
+// ===== اختيار =====
 function toggleCategory(btn,cat){
+
 if(selectedCategories.includes(cat)){
 selectedCategories=selectedCategories.filter(c=>c!==cat);
 btn.style.background="";
@@ -177,11 +178,26 @@ btn.style.background="green";
 }
 }
 
+// ===== زر البداية (المهم) =====
 function startGame(){
+
+if(selectedCategories.length === 0){
+alert("اختار فئة على الأقل");
+return;
+}
+
+team1Name=document.getElementById("team1").value.trim();
+team2Name=document.getElementById("team2").value.trim();
+
+if(!team1Name || !team2Name){
+alert("اكتب أسماء الفرق");
+return;
+}
+
 goCategories();
 }
 
-// ===== اللوحة =====
+// ===== لوحة =====
 function goCategories(){
 
 let html=`
@@ -201,8 +217,7 @@ for(let i=0;i<questions[cat].length;i++){
 let points=(i+1)*100;
 
 html+=`
-<button class="point-btn"
-onclick="openQuestion('${cat}',${i},${points},this)">
+<button class="point-btn" onclick="openQuestion('${cat}',${i},${points},this)">
 ${points}
 </button>`;
 }
@@ -220,6 +235,7 @@ showScreen("categoryScreen");
 function openQuestion(cat,index,points,btn){
 
 if(!usedQuestions[cat])usedQuestions[cat]=[];
+
 if(usedQuestions[cat].includes(index)) return;
 
 usedQuestions[cat].push(index);
@@ -234,25 +250,24 @@ startTimer();
 showQuestion();
 }
 
-// ===== التايمر =====
+// ===== تايمر =====
 function startTimer(){
 
-clearInterval(timerInterval);
+clearInterval(timer);
 time=15;
 
-timerInterval=setInterval(()=>{
+timer=setInterval(()=>{
 time--;
 document.getElementById("timer").innerHTML="⏱️ "+time;
 
 if(time<=0){
-clearInterval(timerInterval);
+clearInterval(timer);
 showScreen("categoryScreen");
-checkEndGame();
 }
 },1000);
 }
 
-// ===== السؤال =====
+// ===== سؤال =====
 function showQuestion(){
 
 let q=questions[currentCategory][currentQuestion];
@@ -272,10 +287,68 @@ document.getElementById("gameScreen").innerHTML=`
 showScreen("gameScreen");
 }
 
-// ===== الإجابة =====
+// ===== جواب =====
 function showAnswer(){
 
 let q=questions[currentCategory][currentQuestion];
 
 document.getElementById("ans").innerHTML=`
-<h2>${q.answer}</h
+<h2>${q.answer}</h2>
+
+<button onclick="addScore(1)">🔴 ${team1Name}</button>
+<button onclick="addScore(2)">🔵 ${team2Name}</button>
+`;
+}
+
+// ===== نقاط =====
+function addScore(team){
+
+clearInterval(timer);
+
+if(team==1)score1+=currentPoints;
+else score2+=currentPoints;
+
+checkEnd();
+showScreen("categoryScreen");
+}
+
+// ===== نهاية اللعبة =====
+function checkEnd(){
+
+let total=0, done=0;
+
+selectedCategories.forEach(cat=>{
+total+=questions[cat].length;
+done+=usedQuestions[cat]?.length || 0;
+});
+
+if(done>=total){
+showEnd();
+}
+}
+
+function showEnd(){
+
+let winner="تعادل";
+
+if(score1>score2)winner="🔴 "+team1Name;
+else if(score2>score1)winner="🔵 "+team2Name;
+
+document.getElementById("endScreen").innerHTML=`
+<h1>🏆 انتهت اللعبة</h1>
+
+<h2>الفائز: ${winner}</h2>
+
+<p>🔴 ${team1Name}: ${score1}</p>
+<p>🔵 ${team2Name}: ${score2}</p>
+
+<button onclick="location.reload()">إعادة اللعب</button>
+`;
+
+showScreen("endScreen");
+}
+
+</script>
+
+</body>
+</html>

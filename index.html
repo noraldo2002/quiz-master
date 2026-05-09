@@ -25,7 +25,9 @@ button{
     border-radius:10px;
     font-size:18px;
     cursor:pointer;
+    transition:0.3s;
 }
+button:hover{opacity:0.8;}
 
 .start-btn{background:red;color:white;font-size:28px;}
 
@@ -111,6 +113,10 @@ input{
 
 <!-- النهاية -->
 <div id="endScreen" class="screen"></div>
+
+<!-- أصوات -->
+<audio id="correctSound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+<audio id="wrongSound" src="https://www.soundjay.com/button/beep-10.wav"></audio>
 
 <script>
 
@@ -204,7 +210,6 @@ html += `<br><button onclick="startGame()">ابدأ اللعب</button>`;
 document.getElementById("categorySelectScreen").innerHTML = html;
 
 function toggleCategory(btn,cat){
-
 if(selectedCategories.includes(cat)){
 selectedCategories = selectedCategories.filter(c=>c!==cat);
 btn.style.background="";
@@ -218,7 +223,6 @@ btn.style.background="green";
 // بدء اللعبة
 // =====================
 function startGame(){
-
 if(selectedCategories.length === 0){
 alert("اختار فئة على الأقل");
 return;
@@ -239,11 +243,10 @@ goCategories();
 // لوحة اللعب
 // =====================
 function goCategories(){
-
 let html = `
 <div class="scoreboard">
-<div>🔴 ${team1Name}: ${score1}</div>
-<div>🔵 ${team2Name}: ${score2}</div>
+<div style="color:red">🔴 ${team1Name}: ${score1}</div>
+<div style="color:cyan">🔵 ${team2Name}: ${score2}</div>
 </div>
 
 <div class="jeopardy-board">
@@ -275,7 +278,6 @@ showScreen("categoryScreen");
 // فتح سؤال
 // =====================
 function openQuestion(cat,index,points,btn){
-
 if(!usedQuestions[cat])usedQuestions[cat]=[];
 if(usedQuestions[cat].includes(index)) return;
 
@@ -295,20 +297,20 @@ showQuestion();
 // التايمر
 // =====================
 function startTimer(){
-
 clearInterval(timer);
 time = 15;
 
 timer = setInterval(()=>{
-
+document.getElementById("timer").innerText = "⏱️ " + time;
 time--;
 
-if(time <= 0){
+if(time < 0){
 clearInterval(timer);
+document.getElementById("wrongSound").play();
+alert("⏰ انتهى الوقت!");
 showScreen("categoryScreen");
 checkEnd();
 }
-
 },1000);
 }
 
@@ -316,7 +318,6 @@ checkEnd();
 // السؤال
 // =====================
 function showQuestion(){
-
 let q = questions[currentCategory][currentQuestion];
 
 document.getElementById("gameScreen").innerHTML = `
@@ -326,6 +327,7 @@ document.getElementById("gameScreen").innerHTML = `
 <h3>${q.q}</h3>
 
 <button onclick="showAnswer()">إظهار الإجابة</button>
+<button onclick="skipQuestion()">تخطي السؤال</button>
 <button onclick="showScreen('categoryScreen')">رجوع</button>
 
 <div id="ans"></div>
@@ -338,7 +340,6 @@ showScreen("gameScreen");
 // الإجابة
 // =====================
 function showAnswer(){
-
 let q = questions[currentCategory][currentQuestion];
 
 document.getElementById("ans").innerHTML = `
@@ -353,93 +354,7 @@ document.getElementById("ans").innerHTML = `
 // النقاط
 // =====================
 function addScore(team){
-
 clearInterval(timer);
 
 if(team === 1){
-score1 += currentPoints;
-}else{
-score2 += currentPoints;
-}
-
-updateScoreUI();
-checkEnd();
-showScreen("categoryScreen");
-}
-
-// =====================
-// تحديث النقاط
-// =====================
-function updateScoreUI(){
-
-let board = document.querySelector(".scoreboard");
-
-if(board){
-board.innerHTML = `
-<div>🔴 ${team1Name}: ${score1}</div>
-<div>🔵 ${team2Name}: ${score2}</div>
-`;
-}
-
-}
-
-// =====================
-// نهاية اللعبة (مضمونة 100%)
-// =====================
-function checkEnd(){
-
-let totalQuestions = 0;
-let answeredQuestions = 0;
-
-selectedCategories.forEach(cat=>{
-totalQuestions += questions[cat].length;
-
-if(usedQuestions[cat]){
-answeredQuestions += usedQuestions[cat].length;
-}
-});
-
-if(answeredQuestions >= totalQuestions){
-showEnd();
-}
-
-}
-
-function showEnd(){
-
-let winner = "تعادل";
-
-if(score1 > score2) winner = "🔴 " + team1Name;
-else if(score2 > score1) winner = "🔵 " + team2Name;
-
-document.getElementById("endScreen").innerHTML = `
-<h1>🏆 انتهت اللعبة</h1>
-
-<h2>الفائز: ${winner}</h2>
-
-<p>🔴 ${team1Name}: ${score1}</p>
-<p>🔵 ${team2Name}: ${score2}</p>
-
-<button onclick="goHome()">🏠 العودة للرئيسية</button>
-`;
-
-showScreen("endScreen");
-}
-
-// =====================
-// الرجوع للبداية
-// =====================
-function goHome(){
-
-score1=0;
-score2=0;
-selectedCategories=[];
-usedQuestions={};
-
-showScreen("startScreen");
-}
-
-</script>
-
-</body>
-</html>
+score1 += currentPoints

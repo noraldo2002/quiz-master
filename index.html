@@ -100,7 +100,7 @@ input{
 <button onclick="showScreen('categorySelectScreen')">متابعة</button>
 </div>
 
-<!-- الفئات -->
+<!-- اختيار الفئات -->
 <div id="categorySelectScreen" class="screen"></div>
 
 <!-- اللوحة -->
@@ -126,10 +126,6 @@ let currentPoints=0;
 
 let timer;
 let time=15;
-
-// ===== مهم للنهاية =====
-let totalButtons = 0;
-let closedButtons = 0;
 
 // =====================
 // الأسئلة (8 فئات)
@@ -244,9 +240,6 @@ goCategories();
 // =====================
 function goCategories(){
 
-totalButtons = 0;
-closedButtons = 0;
-
 let html = `
 <div class="scoreboard">
 <div>🔴 ${team1Name}: ${score1}</div>
@@ -261,9 +254,6 @@ html += `<div class="column">
 <div class="category-title">${cat}</div>`;
 
 for(let i=0;i<questions[cat].length;i++){
-
-totalButtons++;
-
 let points = (i+1)*100;
 
 html += `
@@ -296,7 +286,6 @@ currentQuestion = index;
 currentPoints = points;
 
 btn.disabled = true;
-closedButtons++;
 
 startTimer();
 showQuestion();
@@ -368,9 +357,9 @@ function addScore(team){
 clearInterval(timer);
 
 if(team === 1){
-score1 += Number(currentPoints);
+score1 += currentPoints;
 }else{
-score2 += Number(currentPoints);
+score2 += currentPoints;
 }
 
 updateScoreUI();
@@ -379,7 +368,7 @@ showScreen("categoryScreen");
 }
 
 // =====================
-// تحديث السكور
+// تحديث النقاط
 // =====================
 function updateScoreUI(){
 
@@ -399,7 +388,18 @@ board.innerHTML = `
 // =====================
 function checkEnd(){
 
-if(closedButtons >= totalButtons){
+let totalQuestions = 0;
+let answeredQuestions = 0;
+
+selectedCategories.forEach(cat=>{
+totalQuestions += questions[cat].length;
+
+if(usedQuestions[cat]){
+answeredQuestions += usedQuestions[cat].length;
+}
+});
+
+if(answeredQuestions >= totalQuestions){
 showEnd();
 }
 
@@ -435,8 +435,6 @@ score1=0;
 score2=0;
 selectedCategories=[];
 usedQuestions={};
-totalButtons=0;
-closedButtons=0;
 
 showScreen("startScreen");
 }

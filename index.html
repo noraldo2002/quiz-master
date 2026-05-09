@@ -1,40 +1,151 @@
-// 🎮 لعبة كرة القدم - نظام فئات وأسئلة (نسخة حقيقية مطوّرة)
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>لعبة كرة القدم</title>
 
-let currentSubCategory = ""; let currentIndex = 0;
+<style>
+body {
+  font-family: Arial;
+  text-align: center;
+  direction: rtl;
+  background: #111;
+  color: white;
+}
 
-// ⚽ أسئلة كرة قدم حقيقية const categories = {
+.screen { display: none; padding: 20px; }
+.active { display: block; }
 
-// 🟡 أرقام لاعبين "أرقام لاعبين": [ { q: "ما رقم قميص ليونيل ميسي في أغلب مسيرته؟", a: ["7","10","9","11"], correct: 1 }, { q: "ما رقم كريستيانو رونالدو الشهير؟", a: ["7","10","11","9"], correct: 0 }, { q: "ما رقم نيمار في باريس سان جيرمان؟", a: ["10","11","7","9"], correct: 2 }, { q: "ما رقم محمد صلاح في ليفربول؟", a: ["10","11","7","9"], correct: 1 }, { q: "ما رقم مبابي الأساسي في المنتخب الفرنسي؟", a: ["10","7","9","11"], correct: 1 } ],
+button {
+  padding: 12px 20px;
+  margin: 10px;
+  font-size: 18px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
 
-// 🟢 أسماء لاعبين "أسماء لاعبين": [ { q: "من يرتدي الرقم 10 في الأرجنتين؟", a: ["ميسي","رونالدو","نيمار","دي بروين"], correct: 0 }, { q: "من يرتدي الرقم 7 في البرتغال؟", a: ["رونالدو","ميسي","صلاح","هازارد"], correct: 0 }, { q: "من يرتدي الرقم 11 في ليفربول؟", a: ["محمد صلاح","نيمار","مبابي","ليفاندوفسكي"], correct: 0 }, { q: "من يرتدي الرقم 9 في بايرن ميونخ سابقاً؟", a: ["ليفاندوفسكي","ميسي","رونالدو","بنزيما"], correct: 0 } ],
+.big {
+  font-size: 24px;
+  background: red;
+  color: white;
+}
 
-// 🔵 كرة قدم عالمية "كرة قدم عالمية": [ { q: "أين أقيم كأس العالم 2022؟", a: ["قطر","البرازيل","ألمانيا","فرنسا"], correct: 0 }, { q: "من فاز بدوري أبطال أوروبا 2024؟", a: ["ريال مدريد","برشلونة","مانشستر سيتي","بايرن ميونخ"], correct: 2 }, { q: "كم مرة فازت البرازيل بكأس العالم؟", a: ["5","4","3","6"], correct: 0 }, { q: "أي فريق يسمى الشياطين الحمر؟", a: ["مانشستر يونايتد","ليفربول","ريال مدريد","يوفنتوس"], correct: 0 } ],
+.card {
+  background: #333;
+  padding: 20px;
+  margin: 10px;
+  display: inline-block;
+  width: 150px;
+  border-radius: 10px;
+}
+</style>
 
-// 🟣 من هو اللاعب "من هو اللاعب": [ { q: "من هو اللاعب الملقب بالدون؟", a: ["رونالدو","ميسي","نيمار","صلاح"], correct: 0 }, { q: "من هو البرغوث؟", a: ["ميسي","رونالدو","مبابي","هازارد"], correct: 0 }, { q: "من هو أفضل هداف في تاريخ ريال مدريد؟", a: ["رونالدو","ميسي","بنزيما","راموس"], correct: 0 }, { q: "من هو أسرع لاعب مشهور حالياً؟", a: ["مبابي","رونالدو","صلاح","لوكاكو"], correct: 0 } ]
+</head>
 
+<body>
+
+<!-- 🟢 البداية -->
+<div id="startScreen" class="screen active">
+  <h1>🔥 لعبة كرة القدم 🔥</h1>
+  <button class="big" onclick="goTeams()">ابدأ الطحن</button>
+</div>
+
+<!-- 🟡 الفرق -->
+<div id="teamScreen" class="screen">
+  <h2>أدخل أسماء الفرق</h2>
+  <input id="t1" placeholder="الفريق الأول"><br>
+  <input id="t2" placeholder="الفريق الثاني"><br>
+  <button onclick="goCategories()">متابعة</button>
+</div>
+
+<!-- 🔵 الفئات -->
+<div id="categoryScreen" class="screen">
+  <h1>⚽ كرة القدم</h1>
+
+  <div class="card" onclick="selectCat('أرقام لاعبين')">أرقام لاعبين</div>
+  <div class="card" onclick="selectCat('أسماء لاعبين')">أسماء لاعبين</div>
+  <div class="card" onclick="selectCat('كرة قدم عالمية')">كرة عالمية</div>
+  <div class="card" onclick="selectCat('من هو اللاعب')">من هو اللاعب</div>
+</div>
+
+<!-- 🟣 السؤال -->
+<div id="gameScreen" class="screen"></div>
+
+<script>
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// 🟢 الانتقال
+function goTeams(){ show('teamScreen'); }
+
+function goCategories(){
+  if(!t1.value || !t2.value){
+    alert("اكتب أسماء الفرق");
+    return;
+  }
+  show('categoryScreen');
+}
+
+// ⚽ الأسئلة الحقيقية
+let data = {
+  "أرقام لاعبين": [
+    {q:"رقم ميسي؟", a:["7","10","9","11"], c:1},
+    {q:"رقم رونالدو؟", a:["7","10","11","9"], c:0}
+  ],
+  "أسماء لاعبين": [
+    {q:"صاحب رقم 10 الأرجنتين؟", a:["ميسي","رونالدو","نيمار","صلاح"], c:0}
+  ],
+  "كرة قدم عالمية": [
+    {q:"كأس العالم 2022؟", a:["قطر","البرازيل","ألمانيا","فرنسا"], c:0}
+  ],
+  "من هو اللاعب": [
+    {q:"الدون؟", a:["رونالدو","ميسي","نيمار","صلاح"], c:0}
+  ]
 };
 
-// 🟡 اختيار الفئة الفرعية function selectSubCategory(name) { currentSubCategory = name; currentIndex = 0; showQuestion(); }
+let cat = "";
+let i = 0;
 
-// 🔵 عرض السؤال function showQuestion() { let q = categories[currentSubCategory][currentIndex];
+function selectCat(c){
+  cat = c;
+  i = 0;
+  showGame();
+}
 
-document.body.innerHTML = <h2>⚽ ${currentSubCategory}</h2> <h3>${q.q}</h3> ${q.a.map((ans, i) => <button onclick="checkAnswer(${i})">${ans}</button> ).join("")} ; }
+function showGame(){
+  let q = data[cat][i];
 
-// 🟠 التحقق من الإجابة function checkAnswer(i) { let q = categories[currentSubCategory][currentIndex];
+  document.getElementById("gameScreen").innerHTML = `
+    <h2>${cat}</h2>
+    <h3>${q.q}</h3>
+    ${q.a.map((x, idx)=>`
+      <button onclick="answer(${idx})">${x}</button>
+    `).join("")}
+  `;
 
-if (i === q.correct) { alert("صح ✔️"); } else { alert("غلط ❌"); }
+  show('gameScreen');
+}
 
-currentIndex++;
+function answer(x){
+  let q = data[cat][i];
 
-if (currentIndex < categories[currentSubCategory].length) { showQuestion(); } else { alert("خلصت فئة " + currentSubCategory); location.reload(); } }
+  alert(x === q.c ? "صح ✔️" : "غلط ❌");
 
-// 🟣 واجهة الفئات function showCategories() { document.body.innerHTML = ` <h1>⚽ كرة القدم</h1>
+  i++;
 
-<button onclick="selectSubCategory('أرقام لاعبين')">أرقام لاعبين</button>
-<button onclick="selectSubCategory('أسماء لاعبين')">أسماء لاعبين</button>
-<button onclick="selectSubCategory('كرة قدم عالمية')">كرة قدم عالمية</button>
-<button onclick="selectSubCategory('من هو اللاعب')">من هو اللاعب</button>
+  if(i < data[cat].length){
+    showGame();
+  } else {
+    alert("خلصت الفئة");
+    show('categoryScreen');
+  }
+}
 
-`; }
+</script>
 
-// 🚀 تشغيل البداية showCategories();
+</body>
+</html>

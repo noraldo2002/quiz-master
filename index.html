@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>لعبة التحدي</title>
+<title>🔥 لعبة التحدي 🔥</title>
 
 <style>
 
@@ -64,6 +64,32 @@ input{
     margin-top:30px;
 }
 
+.board{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    margin-top:30px;
+}
+
+.team-box{
+    background:#222;
+    padding:20px;
+    border-radius:20px;
+}
+
+.question-btn{
+    display:block;
+    width:100%;
+    margin:10px 0;
+    background:#444;
+    color:white;
+    font-size:20px;
+}
+
+.question-btn:hover{
+    background:#666;
+}
+
 </style>
 </head>
 
@@ -103,51 +129,7 @@ input{
 
 <!-- الفئات -->
 
-<div id="categoryScreen" class="screen">
-
-    <h1>🎮 اختر الفئة</h1>
-
-    <!-- كرة القدم -->
-
-    <div class="card" onclick="selectCategory('أرقام لاعبين')">
-        ⚽ أرقام لاعبين
-    </div>
-
-    <div class="card" onclick="selectCategory('أسماء لاعبين')">
-        ⚽ أسماء لاعبين
-    </div>
-
-    <div class="card" onclick="selectCategory('كرة قدم عالمية')">
-        ⚽ كرة قدم عالمية
-    </div>
-
-    <div class="card" onclick="selectCategory('من هو اللاعب')">
-        ⚽ من هو اللاعب
-    </div>
-
-    <!-- الإسلامي -->
-
-    <div class="card" onclick="selectCategory('قصص أنبياء')">
-        🕌 قصص أنبياء
-    </div>
-
-    <div class="card" onclick="selectCategory('القرآن الكريم')">
-        📖 القرآن الكريم
-    </div>
-
-    <div class="card" onclick="selectCategory('السيرة النبوية')">
-        ☪️ السيرة النبوية
-    </div>
-
-    <div class="card" onclick="selectCategory('جزء تبارك')">
-        🌙 جزء تبارك
-    </div>
-
-    <div class="card" onclick="selectCategory('إسلامي عام')">
-        🕋 إسلامي عام
-    </div>
-
-</div>
+<div id="categoryScreen" class="screen"></div>
 
 <!-- شاشة السؤال -->
 
@@ -170,22 +152,8 @@ function showScreen(id){
 // البداية
 
 function goTeams(){
+
     showScreen('teamScreen');
-}
-
-// الفئات
-
-function goCategories(){
-
-    let t1 = document.getElementById("team1").value;
-    let t2 = document.getElementById("team2").value;
-
-    if(t1 == "" || t2 == ""){
-        alert("اكتب أسماء الفرق");
-        return;
-    }
-
-    showScreen('categoryScreen');
 
 }
 
@@ -281,6 +249,46 @@ let questions = {
 {q:"في أي شهر يصوم المسلمون؟", answer:"رمضان"},
 {q:"ما ليلة نزول القرآن؟", answer:"ليلة القدر"}
 
+],
+
+"أغاني سبيستون":[
+
+{q:"من يغني حلمي تحطم واختفى؟", answer:"ريمي"},
+{q:"ما الكوكب الخاص بالرياضة؟", answer:"زمردة"},
+{q:"ما اسم قناة الأطفال الشهيرة؟", answer:"سبيستون"},
+{q:"من صاحب أغنية بداية القناص؟", answer:"رشا رزق"},
+{q:"ما اسم كوكب المغامرات؟", answer:"مغامرات"}
+
+],
+
+"ناروتو":[
+
+{q:"ما اسم بطل الأنمي؟", answer:"ناروتو"},
+{q:"ما اسم صديق ناروتو؟", answer:"ساسكي"},
+{q:"من معلمة الفريق 7؟", answer:"كاكاشي"},
+{q:"ما اسم الوحش داخل ناروتو؟", answer:"الكيوبي"},
+{q:"ما اسم قرية ناروتو؟", answer:"الورقة"}
+
+],
+
+"شارات سبيستون":[
+
+{q:"من صاحب شارة القناص؟", answer:"رشا رزق"},
+{q:"ما الأنمي الذي يحتوي على عبارة ننطلق؟", answer:"هزيم الرعد"},
+{q:"أي شارة فيها كلمة أبطال؟", answer:"أبطال الكرة"},
+{q:"أي شارة تبدأ بـ في دربنا؟", answer:"سابق ولاحق"},
+{q:"أي شارة فيها سأرسم دربي؟", answer:"أنا وأخي"}
+
+],
+
+"أكمل الأغنية":[
+
+{q:"أنا وأخي ...", answer:"شقيقي"},
+{q:"هزيم الرعد ...", answer:"البرق"},
+{q:"في دربنا ...", answer:"سعينا"},
+{q:"قد لاح فجر ...", answer:"جديد"},
+{q:"نحمي الأرض ...", answer:"بشجاعة"}
+
 ]
 
 };
@@ -289,6 +297,98 @@ let questions = {
 
 let currentCategory = "";
 let currentQuestion = 0;
+
+// شاشة الفئات
+
+function goCategories(){
+
+    let t1 = document.getElementById("team1").value;
+    let t2 = document.getElementById("team2").value;
+
+    if(t1 == "" || t2 == ""){
+
+        alert("اكتب أسماء الفرق");
+        return;
+
+    }
+
+    let html = `
+
+    <h1>🔥 لوحة التحدي 🔥</h1>
+
+    <div class="board">
+
+        <div class="team-box">
+
+            <h2>${t1}</h2>
+
+            <button class="question-btn"
+            onclick="selectCategory('أرقام لاعبين')">
+            ⚽ أرقام لاعبين - 100
+            </button>
+
+            <button class="question-btn"
+            onclick="selectCategory('أسماء لاعبين')">
+            ⚽ أسماء لاعبين - 200
+            </button>
+
+            <button class="question-btn"
+            onclick="selectCategory('أغاني سبيستون')">
+            🌟 أغاني سبيستون - 300
+            </button>
+
+            <button class="question-btn"
+            onclick="selectCategory('ناروتو')">
+            🍥 ناروتو - 400
+            </button>
+
+            <button class="question-btn"
+            onclick="selectCategory('قصص أنبياء')">
+            🕌 قصص أنبياء - 500
+            </button>
+
+        </div>
+
+        <div class="team-box">
+
+            <h2>${t2}</h2>
+
+            <button class="question-btn"
+            onclick="selectCategory('القرآن الكريم')">
+            📖 القرآن الكريم - 100
+            </button>
+
+            <button class="question-btn"
+            onclick="selectCategory('السيرة النبوية')">
+            ☪️ السيرة النبوية - 200
+            </button>
+
+            <button class="question-btn"
+            onclick="selectCategory('شارات سبيستون')">
+            🎵 شارات سبيستون - 300
+            </button>
+
+            <button class="question-btn"
+            onclick="selectCategory('أكمل الأغنية')">
+            🎤 أكمل الأغنية - 400
+            </button>
+
+            <button class="question-btn"
+            onclick="selectCategory('إسلامي عام')">
+            🕋 إسلامي عام - 500
+            </button>
+
+        </div>
+
+    </div>
+
+    `;
+
+    document.getElementById("categoryScreen").innerHTML = html;
+
+    showScreen("categoryScreen");
+
+}
 
 // اختيار الفئة
 
@@ -360,7 +460,7 @@ function nextQuestion(){
 
         alert("🎉 خلصت الفئة");
 
-        showScreen("categoryScreen");
+        goCategories();
 
     }
 

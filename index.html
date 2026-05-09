@@ -117,7 +117,7 @@ input{
 
 <script>
 
-// ====== المتغيرات ======
+// ===== المتغيرات =====
 let team1Name="", team2Name="";
 let score1=0, score2=0;
 
@@ -128,7 +128,7 @@ let currentCategory="";
 let currentQuestion=0;
 let currentPoints=0;
 
-// ====== الأسئلة ======
+// ===== الأسئلة =====
 let questions={
 
 "جزء تبارك":[
@@ -181,13 +181,13 @@ let questions={
 
 };
 
-// ====== عرض شاشة ======
+// ===== عرض شاشة =====
 function showScreen(id){
 document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
 document.getElementById(id).classList.add('active');
 }
 
-// ====== اختيار الفئات ======
+// ===== اختيار الفئات =====
 function goCategorySelect(){
 
 team1Name=document.getElementById("team1").value;
@@ -213,7 +213,7 @@ document.getElementById("categorySelectScreen").innerHTML=html;
 showScreen("categorySelectScreen");
 }
 
-// ====== اختيار/إلغاء فئة ======
+// ===== اختيار فئة =====
 function toggleCategory(btn,cat){
 
 if(selectedCategories.includes(cat)){
@@ -226,7 +226,7 @@ btn.style.background="green";
 
 }
 
-// ====== بدء اللعبة ======
+// ===== بدء اللعبة =====
 function startGame(){
 
 if(selectedCategories.length==0){
@@ -237,11 +237,11 @@ return;
 goCategories();
 }
 
-// ====== لوحة اللعب ======
+// ===== لوحة اللعب =====
 function goCategories(){
 
 let html=`
-<div class="scoreboard">
+<div class="scoreboard" id="scoreBoard">
 <div>🔴 ${team1Name}: ${score1}</div>
 <div>🔵 ${team2Name}: ${score2}</div>
 </div>
@@ -277,7 +277,7 @@ document.getElementById("categoryScreen").innerHTML=html;
 showScreen("categoryScreen");
 }
 
-// ====== فتح السؤال ======
+// ===== فتح سؤال =====
 function openQuestion(cat,index,points,btn){
 
 if(!usedQuestions[cat])usedQuestions[cat]=[];
@@ -298,7 +298,7 @@ btn.disabled=true;
 showQuestion();
 }
 
-// ====== عرض السؤال ======
+// ===== عرض السؤال =====
 function showQuestion(){
 
 let q=questions[currentCategory][currentQuestion];
@@ -316,7 +316,7 @@ document.getElementById("gameScreen").innerHTML=`
 showScreen("gameScreen");
 }
 
-// ====== عرض الإجابة ======
+// ===== عرض الإجابة =====
 function showAnswer(){
 
 let q=questions[currentCategory][currentQuestion];
@@ -329,11 +329,16 @@ document.getElementById("ans").innerHTML=`
 `;
 }
 
-// ====== النقاط ======
+// ===== إضافة نقاط =====
 function addScore(team){
 
 if(team==1)score1+=currentPoints;
 else score2+=currentPoints;
+
+document.getElementById("scoreBoard").innerHTML=`
+<div>🔴 ${team1Name}: ${score1}</div>
+<div>🔵 ${team2Name}: ${score2}</div>
+`;
 
 showScreen("categoryScreen");
 }

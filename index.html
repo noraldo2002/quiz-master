@@ -2,108 +2,213 @@
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>لعبة الكويز</title>
+<title>Quiz Game</title>
 <style>
-body { font-family: Arial; direction: rtl; background:#111; color:white; text-align:center; }
-button { padding:10px; margin:5px; cursor:pointer; }
-.container { margin-top:50px; }
-.hidden { display:none; }
+body{
+  font-family: Arial;
+  direction: rtl;
+  background: linear-gradient(135deg,#111,#222);
+  color:white;
+  text-align:center;
+}
+
+.container{
+  margin-top:40px;
+}
+
+input, button{
+  padding:10px;
+  margin:5px;
+  border-radius:8px;
+  border:none;
+}
+
+button{
+  cursor:pointer;
+  background:#00c3ff;
+  color:black;
+  font-weight:bold;
+}
+
+button:hover{
+  background:#00a0d1;
+}
+
+.card{
+  background:#1c1c1c;
+  padding:20px;
+  margin:10px auto;
+  width:80%;
+  border-radius:15px;
+  box-shadow:0 0 15px #000;
+}
+
+.hidden{display:none;}
+
+.scoreboard{
+  display:flex;
+  justify-content:space-around;
+  margin-top:10px;
+}
+
+.team{
+  padding:10px;
+  background:#333;
+  border-radius:10px;
+  width:40%;
+}
+
+.timer{
+  font-size:22px;
+  color:#ffcc00;
+}
 </style>
 </head>
 <body>
 
-<div id="teamsPage" class="container">
-  <h2>ادخل أسماء الفرق</h2>
-  <input id="team1" placeholder="الفريق الأول"><br><br>
-  <input id="team2" placeholder="الفريق الثاني"><br><br>
-  <button onclick="goCategories()">التالي</button>
+<div id="setup" class="container">
+  <h2>🎮 لعبة الكويز</h2>
+  <input id="t1" placeholder="اسم الفريق الأول"><br>
+  <input id="t2" placeholder="اسم الفريق الثاني"><br>
+  <button onclick="startSetup()">ابدأ اللعبة</button>
 </div>
 
 <div id="categoriesPage" class="container hidden">
   <h2>اختر الفئة</h2>
-  <div id="categories"></div>
+  <div id="cats"></div>
 </div>
 
-<div id="gamePage" class="container hidden">
-  <h2 id="categoryTitle"></h2>
-  <h3>السؤال:</h3>
-  <p id="question">اضغط لبدء السؤال</p>
-  <button onclick="nextQuestion()">سؤال التالي</button>
+<div id="game" class="container hidden">
+
+  <div class="scoreboard">
+    <div class="team">
+      <h3 id="team1Name"></h3>
+      <p id="score1">0</p>
+    </div>
+    <div class="team">
+      <h3 id="team2Name"></h3>
+      <p id="score2">0</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 id="catTitle"></h2>
+    <p class="timer">⏱ <span id="time">10</span> ثانية</p>
+    <h3 id="question">جاهز؟</h3>
+
+    <button onclick="correct()">✔ صح</button>
+    <button onclick="wrong()">✖ خطأ</button>
+  </div>
+
 </div>
 
 <script>
 
 let categories = [
-  "معلومات عامة",
-  "رتب الحروف",
-  "اسلامي عام",
-  "قصص الانبياء",
-  "جزء تبارك",
-  "السيرة النبوية",
-  "اغاني سبيستون",
-  "ناروتو",
-  "من هو اللاعب",
-  "كرة قدم عالمية",
-  "رقم اللاعب",
-  "الولادة من الخاصرة",
-  "باب الحارة",
-  "تشريح"
+"معلومات عامة","رتب الحروف","اسلامي عام","قصص الانبياء","جزء تبارك",
+"السيرة النبوية","اغاني سبيستون","ناروتو","من هو اللاعب",
+"كرة قدم عالمية","رقم اللاعب","الولادة من الخاصرة","باب الحارة","تشريح"
 ];
 
 let questions = {
-  "معلومات عامة": ["سؤال 1", "سؤال 2"],
-  "رتب الحروف": ["سؤال 1"],
-  "اسلامي عام": ["سؤال 1"],
-  "قصص الانبياء": ["سؤال 1"],
-  "جزء تبارك": ["سؤال 1"],
-  "السيرة النبوية": ["سؤال 1"],
-  "اغاني سبيستون": ["سؤال 1"],
-  "ناروتو": ["سؤال 1"],
-  "من هو اللاعب": ["سؤال 1"],
-  "كرة قدم عالمية": ["سؤال 1"],
-  "رقم اللاعب": ["سؤال 1"],
-  "الولادة من الخاصرة": ["سؤال 1"],
-  "باب الحارة": ["سؤال 1"],
-  "تشريح": ["سؤال 1"]
+"معلومات عامة":["سؤال 1","سؤال 2"],
+"رتب الحروف":["سؤال 1"],
+"اسلامي عام":["سؤال 1"]
 };
 
-let selectedCategory = "";
-let qIndex = 0;
+let team1="", team2="";
+let score1=0, score2=0;
+let currentTeam=1;
+let currentCat="";
+let qIndex=0;
+let timer;
+let timeLeft=10;
 
-function goCategories(){
-  document.getElementById("teamsPage").classList.add("hidden");
+function startSetup(){
+  team1=document.getElementById("t1").value;
+  team2=document.getElementById("t2").value;
+
+  document.getElementById("setup").classList.add("hidden");
   document.getElementById("categoriesPage").classList.remove("hidden");
 
-  let catDiv = document.getElementById("categories");
-  catDiv.innerHTML = "";
+  let c=document.getElementById("cats");
+  c.innerHTML="";
 
   categories.forEach(cat=>{
-    let btn = document.createElement("button");
-    btn.innerText = cat;
-    btn.onclick = ()=>startGame(cat);
-    catDiv.appendChild(btn);
+    let b=document.createElement("button");
+    b.innerText=cat;
+    b.onclick=()=>startGame(cat);
+    c.appendChild(b);
   });
 }
 
 function startGame(cat){
-  selectedCategory = cat;
-  qIndex = 0;
+  currentCat=cat;
+  qIndex=0;
 
   document.getElementById("categoriesPage").classList.add("hidden");
-  document.getElementById("gamePage").classList.remove("hidden");
+  document.getElementById("game").classList.remove("hidden");
 
-  document.getElementById("categoryTitle").innerText = cat;
-  document.getElementById("question").innerText = "جاهز؟ اضغط سؤال التالي";
+  document.getElementById("team1Name").innerText=team1;
+  document.getElementById("team2Name").innerText=team2;
+
+  document.getElementById("catTitle").innerText=cat;
+
+  nextQuestion();
 }
 
 function nextQuestion(){
-  let qs = questions[selectedCategory];
-  if(qIndex < qs.length){
-    document.getElementById("question").innerText = qs[qIndex];
-    qIndex++;
-  } else {
-    document.getElementById("question").innerText = "خلصت الأسئلة 🔥";
+  let qs=questions[currentCat] || ["سؤال تجريبي"];
+
+  if(qIndex>=qs.length){
+    document.getElementById("question").innerText="خلصت الأسئلة 🔥";
+    clearInterval(timer);
+    return;
   }
+
+  document.getElementById("question").innerText=qs[qIndex];
+  qIndex++;
+
+  startTimer();
+}
+
+function startTimer(){
+  clearInterval(timer);
+  timeLeft=10;
+  document.getElementById("time").innerText=timeLeft;
+
+  timer=setInterval(()=>{
+    timeLeft--;
+    document.getElementById("time").innerText=timeLeft;
+
+    if(timeLeft<=0){
+      clearInterval(timer);
+      switchTeam();
+      nextQuestion();
+    }
+  },1000);
+}
+
+function correct(){
+  if(currentTeam===1) score1+=10;
+  else score2+=10;
+  updateScores();
+  switchTeam();
+  nextQuestion();
+}
+
+function wrong(){
+  switchTeam();
+  nextQuestion();
+}
+
+function switchTeam(){
+  currentTeam = currentTeam===1 ? 2 : 1;
+}
+
+function updateScores(){
+  document.getElementById("score1").innerText=score1;
+  document.getElementById("score2").innerText=score2;
 }
 
 </script>

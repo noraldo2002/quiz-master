@@ -51,7 +51,7 @@ input{
 
 .jeopardy-board{
     display:grid;
-    grid-template-columns:repeat(4,1fr);
+    grid-template-columns:repeat(2,1fr);
     gap:10px;
     margin-top:20px;
 }
@@ -270,6 +270,14 @@ btn.style.background = "";
 
 }else{
 
+if(selectedCategories.length >= 6){
+
+alert("الحد الأقصى 6 فئات");
+
+return;
+
+}
+
 selectedCategories.push(cat);
 
 btn.style.background = "green";
@@ -284,9 +292,13 @@ btn.style.background = "green";
 
 function startGame(){
 
-if(selectedCategories.length === 0){
+if(
+selectedCategories.length !== 2 &&
+selectedCategories.length !== 4 &&
+selectedCategories.length !== 6
+){
 
-alert("اختار فئة على الأقل");
+alert("لازم تختار 2 أو 4 أو 6 فئات فقط");
 
 return;
 
@@ -314,6 +326,18 @@ goCategories();
 
 function goCategories(){
 
+let cols = 2;
+
+if(selectedCategories.length === 4){
+cols = 2;
+}
+
+if(selectedCategories.length === 6){
+cols = 3;
+}
+
+document.querySelector(".jeopardy-board");
+
 let html = `
 
 <div class="scoreboard">
@@ -332,7 +356,8 @@ let html = `
 🏁 إنهاء اللعبة
 </button>
 
-<div class="jeopardy-board">
+<div class="jeopardy-board"
+style="grid-template-columns:repeat(${cols},1fr);">
 
 `;
 
@@ -444,6 +469,24 @@ startTimer();
 }
 
 // =====================
+// قراءة السؤال صوتياً
+// =====================
+
+function speakQuestion(text){
+
+let speech = new SpeechSynthesisUtterance(text);
+
+speech.lang = "ar-SA";
+
+speech.rate = 0.9;
+
+window.speechSynthesis.cancel();
+
+window.speechSynthesis.speak(speech);
+
+}
+
+// =====================
 // عرض السؤال
 // =====================
 
@@ -482,6 +525,8 @@ ${q.q}
 `;
 
 showScreen("gameScreen");
+
+speakQuestion(q.q);
 
 }
 
@@ -623,6 +668,8 @@ function showEnd(){
 
 clearInterval(timer);
 
+window.speechSynthesis.cancel();
+
 let winner = "تعادل";
 
 if(score1 > score2){
@@ -678,6 +725,10 @@ usedQuestions = {};
 
 team1Name = "";
 team2Name = "";
+
+clearInterval(timer);
+
+window.speechSynthesis.cancel();
 
 document.getElementById("team1").value = "";
 document.getElementById("team2").value = "";

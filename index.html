@@ -8,6 +8,7 @@
 <title>🔥 لعبة التحدي 🔥</title>
 
 <style>
+
 body{
     margin:0;
     font-family:Arial;
@@ -21,18 +22,18 @@ body{
 .active{display:block;}
 
 button{
-    padding:15px 25px;
-    margin:10px;
+    padding:12px 18px;
+    margin:8px;
     border:none;
-    border-radius:12px;
-    font-size:20px;
+    border-radius:10px;
+    font-size:18px;
     cursor:pointer;
 }
 
-.start-btn{background:red;color:white;font-size:30px;}
+.start-btn{background:red;color:white;font-size:28px;}
 
 input{
-    padding:12px;
+    padding:10px;
     width:250px;
     margin:10px;
     border-radius:10px;
@@ -47,70 +48,87 @@ input{
     margin-top:20px;
 }
 
-.column{background:#1b1b1b;padding:10px;border-radius:15px;}
+.column{
+    background:#1b1b1b;
+    padding:10px;
+    border-radius:15px;
+}
 
 .category-title{
     background:#ff9800;
     padding:10px;
     border-radius:10px;
     font-weight:bold;
+    min-height:60px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
 .point-btn{
     width:100%;
     background:#1565c0;
     color:white;
-    font-size:28px;
+    font-size:22px;
+    font-weight:bold;
 }
 
-.point-btn:disabled{background:#333;}
+.point-btn:disabled{
+    background:#333;
+}
 
 .scoreboard{
     display:flex;
     justify-content:space-around;
-    font-size:26px;
+    font-size:24px;
     background:#222;
     padding:15px;
     border-radius:15px;
 }
+
 </style>
+
 </head>
 
 <body>
 
+<!-- البداية -->
 <div id="startScreen" class="screen active">
 <h1>🔥 لعبة التحدي 🔥</h1>
-<button class="start-btn" onclick="goTeams()">ابدأ اللعبة</button>
+<button class="start-btn" onclick="showScreen('teamScreen')">ابدأ اللعبة</button>
 </div>
 
+<!-- الفرق -->
 <div id="teamScreen" class="screen">
 <h1>⚔️ أدخل أسماء الفرق</h1>
 <input id="team1" placeholder="الفريق الأول"><br>
 <input id="team2" placeholder="الفريق الثاني"><br>
-<button onclick="goCategories()">متابعة</button>
+<button onclick="goCategorySelect()">متابعة</button>
 </div>
 
+<!-- اختيار الفئات -->
+<div id="categorySelectScreen" class="screen"></div>
+
+<!-- لوحة اللعب -->
 <div id="categoryScreen" class="screen"></div>
+
+<!-- السؤال -->
 <div id="gameScreen" class="screen"></div>
 
 <script>
 
-function showScreen(id){
-document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-document.getElementById(id).classList.add('active');
-}
-
-function goTeams(){showScreen('teamScreen');}
-
+// ====== المتغيرات ======
 let team1Name="", team2Name="";
 let score1=0, score2=0;
 
-let currentCategory="";
-let currentQuestion=0;
-
+let selectedCategories=[];
 let usedQuestions={};
 
-// 🔥 الفئات الجديدة + القديمة
+let currentCategory="";
+let currentQuestion=0;
+let currentPoints=0;
+
+// ====== الأسئلة ======
 let questions={
 
 "جزء تبارك":[
@@ -163,8 +181,14 @@ let questions={
 
 };
 
-// 📌 الفرق
-function goCategories(){
+// ====== عرض شاشة ======
+function showScreen(id){
+document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+}
+
+// ====== اختيار الفئات ======
+function goCategorySelect(){
 
 team1Name=document.getElementById("team1").value;
 team2Name=document.getElementById("team2").value;
@@ -176,24 +200,70 @@ return;
 
 let cats=Object.keys(questions);
 
+let html="<h1>اختار الفئات</h1>";
+
+cats.forEach(cat=>{
+html+=`<button onclick="toggleCategory(this,'${cat}')">${cat}</button>`;
+});
+
+html+=`<br><button onclick="startGame()">ابدأ اللعبة</button>`;
+
+document.getElementById("categorySelectScreen").innerHTML=html;
+
+showScreen("categorySelectScreen");
+}
+
+// ====== اختيار/إلغاء فئة ======
+function toggleCategory(btn,cat){
+
+if(selectedCategories.includes(cat)){
+selectedCategories=selectedCategories.filter(c=>c!==cat);
+btn.style.background="";
+}else{
+selectedCategories.push(cat);
+btn.style.background="green";
+}
+
+}
+
+// ====== بدء اللعبة ======
+function startGame(){
+
+if(selectedCategories.length==0){
+alert("اختار فئات");
+return;
+}
+
+goCategories();
+}
+
+// ====== لوحة اللعب ======
+function goCategories(){
+
 let html=`
 <div class="scoreboard">
 <div>🔴 ${team1Name}: ${score1}</div>
 <div>🔵 ${team2Name}: ${score2}</div>
 </div>
 
-<h1>🔥 اللوحة 🔥</h1>
+<h1>🔥 لوحة التحدي 🔥</h1>
+
 <div class="jeopardy-board">
 `;
 
-cats.forEach(cat=>{
-html+=`<div class="column"><div class="category-title">${cat}</div>`;
+selectedCategories.forEach(cat=>{
+
+html+=`<div class="column">
+<div class="category-title">${cat}</div>`;
 
 for(let i=0;i<questions[cat].length;i++){
+
+let points=(i+1)*100;
+
 html+=`
 <button class="point-btn"
-onclick="openQuestion('${cat}',${i},this)">
-${(i+1)*100}
+onclick="openQuestion('${cat}',${i},${points},this)">
+${points}
 </button>`;
 }
 
@@ -203,10 +273,12 @@ html+=`</div>`;
 html+=`</div>`;
 
 document.getElementById("categoryScreen").innerHTML=html;
+
 showScreen("categoryScreen");
 }
 
-function openQuestion(cat,index,btn){
+// ====== فتح السؤال ======
+function openQuestion(cat,index,points,btn){
 
 if(!usedQuestions[cat])usedQuestions[cat]=[];
 
@@ -219,19 +291,21 @@ usedQuestions[cat].push(index);
 
 currentCategory=cat;
 currentQuestion=index;
+currentPoints=points;
 
 btn.disabled=true;
 
 showQuestion();
 }
 
+// ====== عرض السؤال ======
 function showQuestion(){
 
 let q=questions[currentCategory][currentQuestion];
 
 document.getElementById("gameScreen").innerHTML=`
-<h1>${currentCategory}</h1>
-<h2>${q.q}</h2>
+<h2>${currentCategory}</h2>
+<h3>${q.q}</h3>
 
 <button onclick="showAnswer()">إظهار الإجابة</button>
 <button onclick="showScreen('categoryScreen')">رجوع</button>
@@ -242,6 +316,7 @@ document.getElementById("gameScreen").innerHTML=`
 showScreen("gameScreen");
 }
 
+// ====== عرض الإجابة ======
 function showAnswer(){
 
 let q=questions[currentCategory][currentQuestion];
@@ -254,13 +329,11 @@ document.getElementById("ans").innerHTML=`
 `;
 }
 
+// ====== النقاط ======
 function addScore(team){
 
-let q=currentQuestion;
-let points=(q+1)*100;
-
-if(team==1)score1+=points;
-else score2+=points;
+if(team==1)score1+=currentPoints;
+else score2+=currentPoints;
 
 showScreen("categoryScreen");
 }

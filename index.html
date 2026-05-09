@@ -139,13 +139,15 @@ input{
 <!-- لوحة اللعبة -->
 <div id="categoryScreen" class="screen"></div>
 
-<!-- شاشة السؤال -->
+<!-- السؤال -->
 <div id="gameScreen" class="screen"></div>
 
 <!-- النهاية -->
 <div id="endScreen" class="screen"></div>
 
 <script>
+
+window.speechSynthesis.onvoiceschanged = () => {};
 
 let team1Name="";
 let team2Name="";
@@ -220,7 +222,7 @@ let questions = {
 };
 
 // =====================
-// تغيير شاشة
+// تغيير الشاشة
 // =====================
 
 function showScreen(id){
@@ -413,14 +415,24 @@ startTimer();
 }
 
 // =====================
-// صوت السؤال
+// صوت السؤال (إصلاح الإنجليزي)
 // =====================
 
 function speakQuestion(text){
 
-let speech=new SpeechSynthesisUtterance(text);
-speech.lang="ar-SA";
-speech.rate=0.9;
+let voices = window.speechSynthesis.getVoices();
+
+let arabicVoice = voices.find(v => v.lang.includes("ar"));
+
+let speech = new SpeechSynthesisUtterance(text);
+
+speech.lang = "ar-SA";
+
+if(arabicVoice){
+speech.voice = arabicVoice;
+}
+
+speech.rate = 0.9;
 
 window.speechSynthesis.cancel();
 window.speechSynthesis.speak(speech);
@@ -428,7 +440,7 @@ window.speechSynthesis.speak(speech);
 }
 
 // =====================
-// السؤال
+// عرض السؤال
 // =====================
 
 function showQuestion(){
@@ -460,7 +472,7 @@ speakQuestion(q.q);
 }
 
 // =====================
-// الإجابة
+// عرض الإجابة
 // =====================
 
 function showAnswer(){
@@ -529,7 +541,7 @@ b.innerHTML=`
 }
 
 // =====================
-// نهاية
+// النهاية
 // =====================
 
 function checkEnd(){

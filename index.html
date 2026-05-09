@@ -75,6 +75,12 @@ input{
     padding:15px;
     border-radius:15px;
 }
+
+#timer{
+    font-size:26px;
+    color:yellow;
+    margin:10px;
+}
 </style>
 </head>
 
@@ -120,6 +126,10 @@ let currentPoints=0;
 
 let timer;
 let time=15;
+
+// ===== مهم للنهاية =====
+let totalButtons = 0;
+let closedButtons = 0;
 
 // =====================
 // الأسئلة (8 فئات)
@@ -183,7 +193,7 @@ document.getElementById(id).classList.add('active');
 }
 
 // =====================
-// الفئات
+// اختيار الفئات
 // =====================
 let cats = Object.keys(questions);
 
@@ -209,7 +219,7 @@ btn.style.background="green";
 }
 
 // =====================
-// بدء اللعبة (مهم)
+// بدء اللعبة
 // =====================
 function startGame(){
 
@@ -230,9 +240,12 @@ goCategories();
 }
 
 // =====================
-// اللوحة
+// لوحة اللعب
 // =====================
 function goCategories(){
+
+totalButtons = 0;
+closedButtons = 0;
 
 let html = `
 <div class="scoreboard">
@@ -248,6 +261,9 @@ html += `<div class="column">
 <div class="category-title">${cat}</div>`;
 
 for(let i=0;i<questions[cat].length;i++){
+
+totalButtons++;
+
 let points = (i+1)*100;
 
 html += `
@@ -271,7 +287,6 @@ showScreen("categoryScreen");
 function openQuestion(cat,index,points,btn){
 
 if(!usedQuestions[cat])usedQuestions[cat]=[];
-
 if(usedQuestions[cat].includes(index)) return;
 
 usedQuestions[cat].push(index);
@@ -281,6 +296,7 @@ currentQuestion = index;
 currentPoints = points;
 
 btn.disabled = true;
+closedButtons++;
 
 startTimer();
 showQuestion();
@@ -315,6 +331,8 @@ function showQuestion(){
 let q = questions[currentCategory][currentQuestion];
 
 document.getElementById("gameScreen").innerHTML = `
+<div id="timer">⏱️ 15</div>
+
 <h2>${currentCategory}</h2>
 <h3>${q.q}</h3>
 
@@ -343,16 +361,16 @@ document.getElementById("ans").innerHTML = `
 }
 
 // =====================
-// النقاط (مصحح 100%)
+// النقاط
 // =====================
 function addScore(team){
 
 clearInterval(timer);
 
 if(team === 1){
-score1 = score1 + Number(currentPoints);
+score1 += Number(currentPoints);
 }else{
-score2 = score2 + Number(currentPoints);
+score2 += Number(currentPoints);
 }
 
 updateScoreUI();
@@ -377,21 +395,14 @@ board.innerHTML = `
 }
 
 // =====================
-// نهاية اللعبة (مضمونة)
+// نهاية اللعبة (مضمونة 100%)
 // =====================
 function checkEnd(){
 
-let total = 0;
-let done = 0;
-
-selectedCategories.forEach(cat=>{
-total += questions[cat].length;
-done += usedQuestions[cat]?.length || 0;
-});
-
-if(done >= total){
+if(closedButtons >= totalButtons){
 showEnd();
 }
+
 }
 
 function showEnd(){
@@ -416,14 +427,16 @@ showScreen("endScreen");
 }
 
 // =====================
-// رجوع للبداية
+// الرجوع للبداية
 // =====================
 function goHome(){
 
-score1 = 0;
-score2 = 0;
-selectedCategories = [];
-usedQuestions = {};
+score1=0;
+score2=0;
+selectedCategories=[];
+usedQuestions={};
+totalButtons=0;
+closedButtons=0;
 
 showScreen("startScreen");
 }

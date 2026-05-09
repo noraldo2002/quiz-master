@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>لعبة كرة القدم</title>
+<title>لعبة التحدي</title>
 
 <style>
 
@@ -44,7 +44,7 @@ button{
 
 .card{
     background:#222;
-    width:220px;
+    width:240px;
     margin:15px auto;
     padding:20px;
     border-radius:15px;
@@ -73,7 +73,7 @@ input{
 
 <div id="startScreen" class="screen active">
 
-    <h1>🔥 لعبة كرة القدم 🔥</h1>
+    <h1>🔥 لعبة التحدي 🔥</h1>
 
     <button class="start-btn" onclick="goTeams()">
         ابدأ الطحن
@@ -85,7 +85,7 @@ input{
 
 <div id="teamScreen" class="screen">
 
-    <h1>⚽ أدخل أسماء الفرق</h1>
+    <h1>⚔️ أدخل أسماء الفرق</h1>
 
     <input id="team1" placeholder="الفريق الأول">
 
@@ -105,22 +105,46 @@ input{
 
 <div id="categoryScreen" class="screen">
 
-    <h1>⚽ فئات كرة القدم</h1>
+    <h1>🎮 اختر الفئة</h1>
+
+    <!-- كرة القدم -->
 
     <div class="card" onclick="selectCategory('أرقام لاعبين')">
-        أرقام لاعبين
+        ⚽ أرقام لاعبين
     </div>
 
     <div class="card" onclick="selectCategory('أسماء لاعبين')">
-        أسماء لاعبين
+        ⚽ أسماء لاعبين
     </div>
 
     <div class="card" onclick="selectCategory('كرة قدم عالمية')">
-        كرة قدم عالمية
+        ⚽ كرة قدم عالمية
     </div>
 
     <div class="card" onclick="selectCategory('من هو اللاعب')">
-        من هو اللاعب
+        ⚽ من هو اللاعب
+    </div>
+
+    <!-- الإسلامي -->
+
+    <div class="card" onclick="selectCategory('قصص أنبياء')">
+        🕌 قصص أنبياء
+    </div>
+
+    <div class="card" onclick="selectCategory('القرآن الكريم')">
+        📖 القرآن الكريم
+    </div>
+
+    <div class="card" onclick="selectCategory('السيرة النبوية')">
+        ☪️ السيرة النبوية
+    </div>
+
+    <div class="card" onclick="selectCategory('جزء تبارك')">
+        🌙 جزء تبارك
+    </div>
+
+    <div class="card" onclick="selectCategory('إسلامي عام')">
+        🕋 إسلامي عام
     </div>
 
 </div>
@@ -175,12 +199,7 @@ let questions = {
 {q:"ما رقم كريستيانو رونالدو؟", answer:"7"},
 {q:"ما رقم محمد صلاح؟", answer:"11"},
 {q:"ما رقم نيمار؟", answer:"10"},
-{q:"ما رقم مبابي؟", answer:"7"},
-{q:"ما رقم مودريتش؟", answer:"10"},
-{q:"ما رقم بنزيما؟", answer:"9"},
-{q:"ما رقم هالاند؟", answer:"9"},
-{q:"ما رقم دي بروين؟", answer:"17"},
-{q:"ما رقم فينيسيوس؟", answer:"7"}
+{q:"ما رقم مبابي؟", answer:"7"}
 
 ],
 
@@ -211,6 +230,56 @@ let questions = {
 {q:"من هو الجوهرة السوداء؟", answer:"بيليه"},
 {q:"من هو الفرعون المصري؟", answer:"محمد صلاح"},
 {q:"من هو اللاعب الفرنسي السريع؟", answer:"مبابي"}
+
+],
+
+"قصص أنبياء":[
+
+{q:"من هو أول نبي؟", answer:"آدم عليه السلام"},
+{q:"من النبي الذي ابتلعه الحوت؟", answer:"يونس عليه السلام"},
+{q:"من النبي الذي بنى السفينة؟", answer:"نوح عليه السلام"},
+{q:"من كليم الله؟", answer:"موسى عليه السلام"},
+{q:"من أبو الأنبياء؟", answer:"إبراهيم عليه السلام"}
+
+],
+
+"القرآن الكريم":[
+
+{q:"كم عدد سور القرآن الكريم؟", answer:"114"},
+{q:"ما أطول سورة في القرآن؟", answer:"البقرة"},
+{q:"ما أقصر سورة؟", answer:"الكوثر"},
+{q:"ما أول سورة؟", answer:"الفاتحة"},
+{q:"ما آخر سورة؟", answer:"الناس"}
+
+],
+
+"السيرة النبوية":[
+
+{q:"أين ولد النبي ﷺ؟", answer:"مكة"},
+{q:"ما اسم أم النبي ﷺ؟", answer:"آمنة"},
+{q:"من أول زوجات النبي ﷺ؟", answer:"خديجة"},
+{q:"كم عمر النبي ﷺ عند البعثة؟", answer:"40 سنة"},
+{q:"إلى أين هاجر النبي ﷺ؟", answer:"المدينة"}
+
+],
+
+"جزء تبارك":[
+
+{q:"ما أول سورة في جزء تبارك؟", answer:"الملك"},
+{q:"كم عدد آيات سورة الملك؟", answer:"30"},
+{q:"ما السورة المنجية؟", answer:"سورة الملك"},
+{q:"ما آخر سورة في جزء تبارك؟", answer:"المرسلات"},
+{q:"في أي جزء توجد سورة الجن؟", answer:"جزء تبارك"}
+
+],
+
+"إسلامي عام":[
+
+{q:"كم عدد أركان الإسلام؟", answer:"5"},
+{q:"كم عدد الصلوات المفروضة؟", answer:"5"},
+{q:"ما قبلة المسلمين؟", answer:"الكعبة"},
+{q:"في أي شهر يصوم المسلمون؟", answer:"رمضان"},
+{q:"ما ليلة نزول القرآن؟", answer:"ليلة القدر"}
 
 ]
 

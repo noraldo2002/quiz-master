@@ -8,7 +8,6 @@
 <title>🔥 لعبة التحدي 🔥</title>
 
 <style>
-
 body{
     margin:0;
     font-family:Arial;
@@ -18,14 +17,8 @@ body{
     text-align:center;
 }
 
-.screen{
-    display:none;
-    padding:20px;
-}
-
-.active{
-    display:block;
-}
+.screen{display:none;padding:20px;}
+.active{display:block;}
 
 button{
     padding:15px 25px;
@@ -36,11 +29,7 @@ button{
     cursor:pointer;
 }
 
-.start-btn{
-    background:red;
-    color:white;
-    font-size:30px;
-}
+.start-btn{background:red;color:white;font-size:30px;}
 
 input{
     padding:12px;
@@ -51,10 +40,6 @@ input{
     font-size:18px;
 }
 
-#answerBox{
-    margin-top:30px;
-}
-
 .jeopardy-board{
     display:grid;
     grid-template-columns:repeat(6,1fr);
@@ -62,391 +47,222 @@ input{
     margin-top:20px;
 }
 
-.column{
-    background:#1b1b1b;
-    padding:10px;
-    border-radius:15px;
-}
+.column{background:#1b1b1b;padding:10px;border-radius:15px;}
 
 .category-title{
     background:#ff9800;
     padding:10px;
     border-radius:10px;
-    font-size:18px;
-    min-height:70px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    margin-bottom:10px;
     font-weight:bold;
 }
 
 .point-btn{
     width:100%;
-    margin:5px 0;
     background:#1565c0;
     color:white;
     font-size:28px;
-    font-weight:bold;
 }
 
-.point-btn:hover{
-    background:#1976d2;
-}
+.point-btn:disabled{background:#333;}
 
 .scoreboard{
     display:flex;
     justify-content:space-around;
-    margin-top:20px;
-    font-size:28px;
+    font-size:26px;
     background:#222;
     padding:15px;
     border-radius:15px;
 }
-
-.answer-btn{
-    background:green;
-    color:white;
-}
-
-.back-btn{
-    background:#555;
-    color:white;
-}
-
 </style>
 </head>
 
 <body>
 
-<!-- البداية -->
-
 <div id="startScreen" class="screen active">
-
-    <h1>🔥 لعبة التحدي 🔥</h1>
-
-    <button class="start-btn" onclick="goTeams()">
-        ابدأ اللعبة
-    </button>
-
+<h1>🔥 لعبة التحدي 🔥</h1>
+<button class="start-btn" onclick="goTeams()">ابدأ اللعبة</button>
 </div>
-
-<!-- الفرق -->
 
 <div id="teamScreen" class="screen">
-
-    <h1>⚔️ أدخل أسماء الفرق</h1>
-
-    <input id="team1" placeholder="الفريق الأول">
-
-    <br>
-
-    <input id="team2" placeholder="الفريق الثاني">
-
-    <br>
-
-    <button onclick="goCategories()">
-        متابعة
-    </button>
-
+<h1>⚔️ أدخل أسماء الفرق</h1>
+<input id="team1" placeholder="الفريق الأول"><br>
+<input id="team2" placeholder="الفريق الثاني"><br>
+<button onclick="goCategories()">متابعة</button>
 </div>
 
-<!-- لوحة اللعب -->
-
 <div id="categoryScreen" class="screen"></div>
-
-<!-- شاشة السؤال -->
-
 <div id="gameScreen" class="screen"></div>
 
 <script>
 
-// التنقل بين الشاشات
-
 function showScreen(id){
-
-    document.querySelectorAll('.screen')
-    .forEach(screen => screen.classList.remove('active'));
-
-    document.getElementById(id)
-    .classList.add('active');
-
+document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+document.getElementById(id).classList.add('active');
 }
 
-// البداية
+function goTeams(){showScreen('teamScreen');}
 
-function goTeams(){
+let team1Name="", team2Name="";
+let score1=0, score2=0;
 
-    showScreen('teamScreen');
+let currentCategory="";
+let currentQuestion=0;
 
-}
+let usedQuestions={};
 
-// الأسئلة
+// 🔥 الفئات الجديدة + القديمة
+let questions={
 
-let questions = {
-
-"أرقام لاعبين":[
-
-{q:"ما رقم ليونيل ميسي؟", answer:"10"},
-{q:"ما رقم كريستيانو رونالدو؟", answer:"7"},
-{q:"ما رقم محمد صلاح؟", answer:"11"},
-{q:"ما رقم نيمار؟", answer:"10"},
-{q:"ما رقم مبابي؟", answer:"7"},
-{q:"ما رقم مودريتش؟", answer:"10"}
-
+"جزء تبارك":[
+{q:"كم عدد سور جزء تبارك؟",answer:"11"},
+{q:"ما أول سورة في جزء تبارك؟",answer:"الملك"},
+{q:"ما آخر سورة؟",answer:"المرسلات"}
 ],
 
-"كرة قدم عالمية":[
-
-{q:"أين أقيم كأس العالم 2022؟", answer:"قطر"},
-{q:"من أكثر منتخب فاز بكأس العالم؟", answer:"البرازيل"},
-{q:"كم عدد لاعبي كرة القدم؟", answer:"11"},
-{q:"ما النادي الملكي؟", answer:"ريال مدريد"},
-{q:"ما النادي الملقب بالشياطين الحمر؟", answer:"مانشستر يونايتد"},
-{q:"من فاز بكأس العالم 2018؟", answer:"فرنسا"}
-
+"قصص انبياء":[
+{q:"من النبي الذي ابتلعه الحوت؟",answer:"يونس"},
+{q:"من كلم الله؟",answer:"موسى"},
+{q:"من بنى السفينة؟",answer:"نوح"}
 ],
 
-"القرآن الكريم":[
-
-{q:"كم عدد سور القرآن الكريم؟", answer:"114"},
-{q:"ما أطول سورة في القرآن؟", answer:"البقرة"},
-{q:"ما أقصر سورة؟", answer:"الكوثر"},
-{q:"ما أول سورة؟", answer:"الفاتحة"},
-{q:"ما آخر سورة؟", answer:"الناس"},
-{q:"ما السورة التي تسمى قلب القرآن؟", answer:"يس"}
-
+"من هو اللاعب":[
+{q:"من هو اللاعب رقم 7 الشهير؟",answer:"كريستيانو رونالدو"},
+{q:"من هو ميسي؟",answer:"لاعب أرجنتيني"},
+{q:"من هو مبابي؟",answer:"لاعب فرنسي"}
 ],
 
-"السيرة النبوية":[
-
-{q:"أين ولد النبي ﷺ؟", answer:"مكة"},
-{q:"ما اسم أم النبي ﷺ؟", answer:"آمنة"},
-{q:"من أول زوجات النبي ﷺ؟", answer:"خديجة"},
-{q:"كم عمر النبي ﷺ عند البعثة؟", answer:"40"},
-{q:"إلى أين هاجر النبي ﷺ؟", answer:"المدينة"},
-{q:"من كان مع النبي ﷺ في الغار؟", answer:"أبو بكر"}
-
+"معلومات عامة":[
+{q:"ما عاصمة الأردن؟",answer:"عمان"},
+{q:"كم قارة؟",answer:"7"},
+{q:"أكبر محيط؟",answer:"الهادئ"}
 ],
 
-"ناروتو":[
-
-{q:"ما اسم بطل الأنمي؟", answer:"ناروتو"},
-{q:"من صديق ناروتو؟", answer:"ساسكي"},
-{q:"ما اسم المعلم؟", answer:"كاكاشي"},
-{q:"ما اسم الوحش داخل ناروتو؟", answer:"الكيوبي"},
-{q:"من تحب ناروتو؟", answer:"هيناتا"},
-{q:"ما اسم القرية؟", answer:"الورقة"}
-
+"رتب الحروف":[
+{q:"رتب: ل م ع",answer:"علم"},
+{q:"رتب: ك ب ت",answer:"كتب"},
+{q:"رتب: ر د ن",answer:"نرد"}
 ],
 
-"أغاني سبيستون":[
+"الولادة من الخاصرة":[
+{q:"نوع العمل؟",answer:"مسلسل"},
+{q:"بطل العمل؟",answer:"تيم حسن"},
+{q:"سنة العرض؟",answer:"2011"}
+],
 
-{q:"من مغنية شارة القناص؟", answer:"رشا رزق"},
-{q:"ما اسم كوكب الرياضة؟", answer:"زمردة"},
-{q:"ما اسم كوكب المغامرات؟", answer:"مغامرات"},
-{q:"ما اسم كوكب العلوم؟", answer:"أبجد"},
-{q:"ما اسم قناة الأطفال الشهيرة؟", answer:"سبيستون"},
-{q:"أي شارة فيها قد لاح فجر جديد؟", answer:"القناص"}
+"اكلات تقليدية":[
+{q:"ما هو المنسف؟",answer:"طبق أردني"},
+{q:"ما هو الفلافل؟",answer:"أكلة من الحمص"},
+{q:"ما هي المقلوبة؟",answer:"رز وخضار"}
+],
 
+"اعلام":[
+{q:"علم الأردن ألوانه؟",answer:"أسود أبيض أخضر أحمر"},
+{q:"علم فلسطين؟",answer:"أسود أبيض أخضر أحمر"},
+{q:"علم مصر فيه؟",answer:"أحمر أبيض أسود"}
 ]
 
 };
 
-// المتغيرات
-
-let currentCategory = "";
-let currentQuestion = 0;
-
-let score1 = 0;
-let score2 = 0;
-
-// لوحة الفئات
-
+// 📌 الفرق
 function goCategories(){
 
-    let t1 = document.getElementById("team1").value;
-    let t2 = document.getElementById("team2").value;
+team1Name=document.getElementById("team1").value;
+team2Name=document.getElementById("team2").value;
 
-    if(t1 == "" || t2 == ""){
-
-        alert("اكتب أسماء الفرق");
-        return;
-
-    }
-
-    let selectedCategories = [
-
-        "أرقام لاعبين",
-        "كرة قدم عالمية",
-        "القرآن الكريم",
-        "السيرة النبوية",
-        "ناروتو",
-        "أغاني سبيستون"
-
-    ];
-
-    let html = `
-
-    <div class="scoreboard">
-
-        <div>
-        🔴 ${t1} : ${score1}
-        </div>
-
-        <div>
-        🔵 ${t2} : ${score2}
-        </div>
-
-    </div>
-
-    <h1>🔥 لوحة التحدي 🔥</h1>
-
-    <div class="jeopardy-board">
-
-    `;
-
-    selectedCategories.forEach(category=>{
-
-        html += `
-
-        <div class="column">
-
-            <div class="category-title">
-                ${category}
-            </div>
-
-        `;
-
-        for(let i=1;i<=6;i++){
-
-            let points = i * 100;
-
-            html += `
-
-            <button class="point-btn"
-            onclick="openQuestion('${category}', ${i-1}, ${points}, this)">
-
-                ${points}
-
-            </button>
-
-            `;
-
-        }
-
-        html += `</div>`;
-
-    });
-
-    html += `</div>`;
-
-    document.getElementById("categoryScreen").innerHTML = html;
-
-    showScreen("categoryScreen");
-
+if(!team1Name||!team2Name){
+alert("اكتب أسماء الفرق");
+return;
 }
 
-// فتح السؤال
+let cats=Object.keys(questions);
 
-function openQuestion(category,index,points,btn){
+let html=`
+<div class="scoreboard">
+<div>🔴 ${team1Name}: ${score1}</div>
+<div>🔵 ${team2Name}: ${score2}</div>
+</div>
 
-    currentCategory = category;
+<h1>🔥 اللوحة 🔥</h1>
+<div class="jeopardy-board">
+`;
 
-    currentQuestion = index;
+cats.forEach(cat=>{
+html+=`<div class="column"><div class="category-title">${cat}</div>`;
 
-    btn.disabled = true;
-
-    btn.style.background = "#333";
-
-    showQuestion(points);
-
+for(let i=0;i<questions[cat].length;i++){
+html+=`
+<button class="point-btn"
+onclick="openQuestion('${cat}',${i},this)">
+${(i+1)*100}
+</button>`;
 }
 
-// عرض السؤال
+html+=`</div>`;
+});
 
-function showQuestion(points){
+html+=`</div>`;
 
-    let q = questions[currentCategory][currentQuestion];
-
-    document.getElementById("gameScreen").innerHTML = `
-
-    <h1>${currentCategory}</h1>
-
-    <h2>💰 ${points} نقطة</h2>
-
-    <h2>${q.q}</h2>
-
-    <button class="answer-btn"
-    onclick="showAnswer(${points})">
-
-    إظهار الإجابة
-
-    </button>
-
-    <br>
-
-    <button class="back-btn"
-    onclick="goCategories()">
-
-    رجوع
-
-    </button>
-
-    <div id="answerBox"></div>
-
-    `;
-
-    showScreen("gameScreen");
-
+document.getElementById("categoryScreen").innerHTML=html;
+showScreen("categoryScreen");
 }
 
-// إظهار الإجابة
+function openQuestion(cat,index,btn){
 
-function showAnswer(points){
+if(!usedQuestions[cat])usedQuestions[cat]=[];
 
-    let q = questions[currentCategory][currentQuestion];
-
-    document.getElementById("answerBox").innerHTML = `
-
-    <h2>✅ الإجابة:</h2>
-
-    <h1>${q.answer}</h1>
-
-    <button onclick="team1Point(${points})">
-
-    🔴 نقطة للفريق الأول
-
-    </button>
-
-    <button onclick="team2Point(${points})">
-
-    🔵 نقطة للفريق الثاني
-
-    </button>
-
-    `;
-
+if(usedQuestions[cat].includes(index)){
+alert("هذا السؤال تم حله");
+return;
 }
 
-// نقاط الفريق الأول
+usedQuestions[cat].push(index);
 
-function team1Point(points){
+currentCategory=cat;
+currentQuestion=index;
 
-    score1 += points;
+btn.disabled=true;
 
-    goCategories();
-
+showQuestion();
 }
 
-// نقاط الفريق الثاني
+function showQuestion(){
 
-function team2Point(points){
+let q=questions[currentCategory][currentQuestion];
 
-    score2 += points;
+document.getElementById("gameScreen").innerHTML=`
+<h1>${currentCategory}</h1>
+<h2>${q.q}</h2>
 
-    goCategories();
+<button onclick="showAnswer()">إظهار الإجابة</button>
+<button onclick="showScreen('categoryScreen')">رجوع</button>
 
+<div id="ans"></div>
+`;
+
+showScreen("gameScreen");
+}
+
+function showAnswer(){
+
+let q=questions[currentCategory][currentQuestion];
+
+document.getElementById("ans").innerHTML=`
+<h2>${q.answer}</h2>
+
+<button onclick="addScore(1)">🔴 ${team1Name}</button>
+<button onclick="addScore(2)">🔵 ${team2Name}</button>
+`;
+}
+
+function addScore(team){
+
+let q=currentQuestion;
+let points=(q+1)*100;
+
+if(team==1)score1+=points;
+else score2+=points;
+
+showScreen("categoryScreen");
 }
 
 </script>

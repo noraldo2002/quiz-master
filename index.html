@@ -95,6 +95,13 @@ input{
     margin:15px;
 }
 
+.end-btn{
+    background:red;
+    color:white;
+    font-size:22px;
+    margin-top:15px;
+}
+
 </style>
 </head>
 
@@ -129,10 +136,10 @@ input{
 <!-- اختيار الفئات -->
 <div id="categorySelectScreen" class="screen"></div>
 
-<!-- اللوحة -->
+<!-- لوحة اللعبة -->
 <div id="categoryScreen" class="screen"></div>
 
-<!-- السؤال -->
+<!-- شاشة السؤال -->
 <div id="gameScreen" class="screen"></div>
 
 <!-- النهاية -->
@@ -213,7 +220,7 @@ let questions = {
 };
 
 // =====================
-// التنقل بين الشاشات
+// تغيير الشاشة
 // =====================
 
 function showScreen(id){
@@ -320,6 +327,10 @@ let html = `
 </div>
 
 </div>
+
+<button class="end-btn" onclick="showEnd()">
+🏁 إنهاء اللعبة
+</button>
 
 <div class="jeopardy-board">
 
@@ -511,7 +522,7 @@ ${q.answer}
 }
 
 // =====================
-// إضافة النقاط
+// إضافة نقاط
 // =====================
 
 function addScore(team){
@@ -609,6 +620,8 @@ showEnd();
 // =====================
 
 function showEnd(){
+
+clearInterval(timer);
 
 let winner = "تعادل";
 

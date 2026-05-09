@@ -147,21 +147,21 @@ input{
 
 <script>
 
-let team1Name = "";
-let team2Name = "";
+let team1Name="";
+let team2Name="";
 
-let score1 = 0;
-let score2 = 0;
+let score1=0;
+let score2=0;
 
-let selectedCategories = [];
-let usedQuestions = {};
+let selectedCategories=[];
+let usedQuestions={};
 
-let currentCategory = "";
-let currentQuestion = 0;
-let currentPoints = 0;
+let currentCategory="";
+let currentQuestion=0;
+let currentPoints=0;
 
 let timer;
-let time = 0;
+let time=0;
 
 // =====================
 // الأسئلة
@@ -220,13 +220,13 @@ let questions = {
 };
 
 // =====================
-// تغيير الشاشة
+// تغيير شاشة
 // =====================
 
 function showScreen(id){
 
-document.querySelectorAll('.screen').forEach(screen=>{
-screen.classList.remove('active');
+document.querySelectorAll('.screen').forEach(s=>{
+s.classList.remove('active');
 });
 
 document.getElementById(id).classList.add('active');
@@ -237,51 +237,37 @@ document.getElementById(id).classList.add('active');
 // اختيار الفئات
 // =====================
 
-let cats = Object.keys(questions);
+let cats=Object.keys(questions);
 
-let html = "<h2>📚 اختر الفئات</h2>";
+let html="<h2>📚 اختر الفئات (2 أو 4 أو 6 فقط)</h2>";
 
-cats.forEach((cat)=>{
-
-html += `
-<button onclick="toggleCategory(this,'${cat}')">
-${cat}
-</button>
+cats.forEach(cat=>{
+html+=`
+<button onclick="toggleCategory(this,'${cat}')">${cat}</button>
 `;
-
 });
 
-html += `
+html+=`
 <br>
-<button onclick="startGame()">
-ابدأ اللعب
-</button>
+<button onclick="startGame()">ابدأ اللعب</button>
 `;
 
-document.getElementById("categorySelectScreen").innerHTML = html;
+document.getElementById("categorySelectScreen").innerHTML=html;
 
 function toggleCategory(btn,cat){
 
 if(selectedCategories.includes(cat)){
-
-selectedCategories = selectedCategories.filter(c=>c!==cat);
-
-btn.style.background = "";
-
+selectedCategories=selectedCategories.filter(c=>c!==cat);
+btn.style.background="";
 }else{
 
-if(selectedCategories.length >= 6){
-
+if(selectedCategories.length>=6){
 alert("الحد الأقصى 6 فئات");
-
 return;
-
 }
 
 selectedCategories.push(cat);
-
-btn.style.background = "green";
-
+btn.style.background="green";
 }
 
 }
@@ -293,27 +279,20 @@ btn.style.background = "green";
 function startGame(){
 
 if(
-selectedCategories.length !== 2 &&
-selectedCategories.length !== 4 &&
-selectedCategories.length !== 6
+selectedCategories.length!==2 &&
+selectedCategories.length!==4 &&
+selectedCategories.length!==6
 ){
-
 alert("لازم تختار 2 أو 4 أو 6 فئات فقط");
-
 return;
-
 }
 
-team1Name = document.getElementById("team1").value.trim();
-
-team2Name = document.getElementById("team2").value.trim();
+team1Name=document.getElementById("team1").value.trim();
+team2Name=document.getElementById("team2").value.trim();
 
 if(!team1Name || !team2Name){
-
 alert("اكتب أسماء الفرق");
-
 return;
-
 }
 
 goCategories();
@@ -326,77 +305,53 @@ goCategories();
 
 function goCategories(){
 
-let cols = 2;
-
-if(selectedCategories.length === 4){
-cols = 2;
-}
-
-if(selectedCategories.length === 6){
-cols = 3;
-}
-
-document.querySelector(".jeopardy-board");
-
-let html = `
+let html=`
 
 <div class="scoreboard">
 
-<div>
-🔴 ${team1Name}: ${score1}
-</div>
-
-<div>
-🔵 ${team2Name}: ${score2}
-</div>
+<div>🔴 ${team1Name}: ${score1}</div>
+<div>🔵 ${team2Name}: ${score2}</div>
 
 </div>
 
-<button class="end-btn" onclick="showEnd()">
-🏁 إنهاء اللعبة
-</button>
+<button class="end-btn" onclick="showEnd()">🏁 إنهاء اللعبة</button>
 
-<div class="jeopardy-board"
-style="grid-template-columns:repeat(${cols},1fr);">
+<div class="jeopardy-board">
 
 `;
 
 selectedCategories.forEach(cat=>{
 
-html += `
+html+=`
 
 <div class="column">
 
-<div class="category-title">
-${cat}
-</div>
+<div class="category-title">${cat}</div>
 
 `;
 
 for(let i=0;i<questions[cat].length;i++){
 
-let points = (i+1)*100;
+let points=(i+1)*100;
 
-html += `
+html+=`
 
 <button class="point-btn"
 onclick="openQuestion('${cat}',${i},${points},this)">
-
 ${points}
-
 </button>
 
 `;
 
 }
 
-html += `</div>`;
+html+=`</div>`;
 
 });
 
-html += `</div>`;
+html+=`</div>`;
 
-document.getElementById("categoryScreen").innerHTML = html;
+document.getElementById("categoryScreen").innerHTML=html;
 
 showScreen("categoryScreen");
 
@@ -409,23 +364,20 @@ showScreen("categoryScreen");
 function openQuestion(cat,index,points,btn){
 
 if(!usedQuestions[cat]){
-usedQuestions[cat] = [];
+usedQuestions[cat]=[];
 }
 
-if(usedQuestions[cat].includes(index)){
-return;
-}
+if(usedQuestions[cat].includes(index)) return;
 
 usedQuestions[cat].push(index);
 
-currentCategory = cat;
-currentQuestion = index;
-currentPoints = points;
+currentCategory=cat;
+currentQuestion=index;
+currentPoints=points;
 
-btn.disabled = true;
+btn.disabled=true;
 
 startTimer();
-
 showQuestion();
 
 }
@@ -438,19 +390,14 @@ function startTimer(){
 
 clearInterval(timer);
 
-time = 0;
+time=0;
 
-timer = setInterval(()=>{
+timer=setInterval(()=>{
 
 time++;
 
-let timerBox = document.getElementById("timer");
-
-if(timerBox){
-
-timerBox.innerText = "⏱️ " + time;
-
-}
+let t=document.getElementById("timer");
+if(t) t.innerText="⏱️ "+time;
 
 },1000);
 
@@ -459,66 +406,48 @@ timerBox.innerText = "⏱️ " + time;
 function resetTimer(){
 
 clearInterval(timer);
-
-time = 0;
-
-document.getElementById("timer").innerText = "⏱️ 0";
-
+time=0;
+document.getElementById("timer").innerText="⏱️ 0";
 startTimer();
 
 }
 
 // =====================
-// قراءة السؤال صوتياً
+// صوت السؤال
 // =====================
 
 function speakQuestion(text){
 
-let speech = new SpeechSynthesisUtterance(text);
-
-speech.lang = "ar-SA";
-
-speech.rate = 0.9;
+let speech=new SpeechSynthesisUtterance(text);
+speech.lang="ar-SA";
+speech.rate=0.9;
 
 window.speechSynthesis.cancel();
-
 window.speechSynthesis.speak(speech);
 
 }
 
 // =====================
-// عرض السؤال
+// السؤال
 // =====================
 
 function showQuestion(){
 
-let q = questions[currentCategory][currentQuestion];
+let q=questions[currentCategory][currentQuestion];
 
-document.getElementById("gameScreen").innerHTML = `
+document.getElementById("gameScreen").innerHTML=`
 
-<div id="timer">
-⏱️ 0
-</div>
+<div id="timer">⏱️ 0</div>
 
-<button onclick="resetTimer()">
-🔄 إعادة الوقت
-</button>
+<button onclick="resetTimer()">🔄 إعادة الوقت</button>
 
-<h2>
-${currentCategory}
-</h2>
+<h2>${currentCategory}</h2>
 
-<h3>
-${q.q}
-</h3>
+<h3>${q.q}</h3>
 
-<button onclick="showAnswer()">
-إظهار الإجابة
-</button>
+<button onclick="showAnswer()">إظهار الإجابة</button>
 
-<button onclick="showScreen('categoryScreen')">
-رجوع
-</button>
+<button onclick="showScreen('categoryScreen')">رجوع</button>
 
 <div id="ans"></div>
 
@@ -531,99 +460,68 @@ speakQuestion(q.q);
 }
 
 // =====================
-// عرض الإجابة
+// الإجابة
 // =====================
 
 function showAnswer(){
 
 clearInterval(timer);
 
-let q = questions[currentCategory][currentQuestion];
+let q=questions[currentCategory][currentQuestion];
 
-document.getElementById("ans").innerHTML = `
+document.getElementById("ans").innerHTML=`
 
-<h2>
-${q.answer}
-</h2>
+<h2>${q.answer}</h2>
 
-<h3>
-مين جاوب صح؟
-</h3>
+<h3>مين جاوب صح؟</h3>
 
-<button onclick="addScore(1)">
-🔴 ${team1Name}
-</button>
-
-<button onclick="addScore(2)">
-🔵 ${team2Name}
-</button>
-
-<button onclick="noAnswer()">
-❌ ولا حد
-</button>
+<button onclick="addScore(1)">🔴 ${team1Name}</button>
+<button onclick="addScore(2)">🔵 ${team2Name}</button>
+<button onclick="noAnswer()">❌ ولا حد</button>
 
 `;
 
 }
 
 // =====================
-// إضافة نقاط
+// النقاط
 // =====================
 
 function addScore(team){
 
 clearInterval(timer);
 
-if(team === 1){
-
-score1 += currentPoints;
-
-}else{
-
-score2 += currentPoints;
-
-}
+if(team===1) score1+=currentPoints;
+else score2+=currentPoints;
 
 updateScoreUI();
-
 checkEnd();
-
 showScreen("categoryScreen");
 
 }
 
 // =====================
-// ولا حد جاوب
+// ولا حد
 // =====================
 
 function noAnswer(){
-
 showScreen("categoryScreen");
-
 checkEnd();
-
 }
 
 // =====================
-// تحديث النقاط
+// تحديث
 // =====================
 
 function updateScoreUI(){
 
-let board = document.querySelector(".scoreboard");
+let b=document.querySelector(".scoreboard");
 
-if(board){
+if(b){
 
-board.innerHTML = `
-
-<div>
-🔴 ${team1Name}: ${score1}
-</div>
-
-<div>
-🔵 ${team2Name}: ${score2}
-</div>
-
+b.innerHTML=`
+<div>🔴 ${team1Name}: ${score1}</div>
+<div>🔵 ${team2Name}: ${score2}</div>
 `;
 
 }
@@ -631,78 +529,47 @@ board.innerHTML = `
 }
 
 // =====================
-// التحقق من النهاية
+// نهاية
 // =====================
 
 function checkEnd(){
 
-let totalQuestions = 0;
-
-let answeredQuestions = 0;
+let total=0;
+let done=0;
 
 selectedCategories.forEach(cat=>{
-
-totalQuestions += questions[cat].length;
-
-if(usedQuestions[cat]){
-
-answeredQuestions += usedQuestions[cat].length;
-
-}
-
+total+=questions[cat].length;
+if(usedQuestions[cat]) done+=usedQuestions[cat].length;
 });
 
-if(answeredQuestions >= totalQuestions){
-
-showEnd();
-
-}
+if(done>=total) showEnd();
 
 }
 
 // =====================
-// شاشة النهاية
+// إنهاء
 // =====================
 
 function showEnd(){
 
 clearInterval(timer);
-
 window.speechSynthesis.cancel();
 
-let winner = "تعادل";
+let winner="تعادل";
 
-if(score1 > score2){
+if(score1>score2) winner="🔴 "+team1Name;
+else if(score2>score1) winner="🔵 "+team2Name;
 
-winner = "🔴 " + team1Name;
+document.getElementById("endScreen").innerHTML=`
 
-}else if(score2 > score1){
+<h1>🏆 انتهت اللعبة</h1>
 
-winner = "🔵 " + team2Name;
+<h2>الفائز: ${winner}</h2>
 
-}
+<p>🔴 ${team1Name}: ${score1}</p>
+<p>🔵 ${team2Name}: ${score2}</p>
 
-document.getElementById("endScreen").innerHTML = `
-
-<h1>
-🏆 انتهت اللعبة
-</h1>
-
-<h2>
-الفائز: ${winner}
-</h2>
-
-<p>
-🔴 ${team1Name}: ${score1}
-</p>
-
-<p>
-🔵 ${team2Name}: ${score2}
-</p>
-
-<button onclick="goHome()">
-🏠 العودة للرئيسية
-</button>
+<button onclick="goHome()">🏠 العودة</button>
 
 `;
 
@@ -711,30 +578,28 @@ showScreen("endScreen");
 }
 
 // =====================
-// العودة للبداية
+// رجوع
 // =====================
 
 function goHome(){
 
-score1 = 0;
-score2 = 0;
+score1=0;
+score2=0;
 
-selectedCategories = [];
+selectedCategories=[];
+usedQuestions={};
 
-usedQuestions = {};
-
-team1Name = "";
-team2Name = "";
+team1Name="";
+team2Name="";
 
 clearInterval(timer);
-
 window.speechSynthesis.cancel();
 
-document.getElementById("team1").value = "";
-document.getElementById("team2").value = "";
+document.getElementById("team1").value="";
+document.getElementById("team2").value="";
 
-document.querySelectorAll("#categorySelectScreen button").forEach(btn=>{
-btn.style.background = "";
+document.querySelectorAll("#categorySelectScreen button").forEach(b=>{
+b.style.background="";
 });
 
 showScreen("startScreen");

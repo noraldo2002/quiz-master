@@ -134,4 +134,301 @@ let questions = {
 "قصص انبياء":[
 {q:"من ابتلعه الحوت؟",answer:"يونس"},
 {q:"من كلم الله؟",answer:"موسى"},
-{q:"من بنى
+{q:"من بنى السفينة؟",answer:"نوح"}
+],
+
+"جزء تبارك":[
+{q:"عدد السور؟",answer:"11"},
+{q:"أول سورة؟",answer:"الملك"},
+{q:"آخر سورة؟",answer:"المرسلات"}
+],
+
+"رتب الحروف":[
+{q:"ل م ع",answer:"علم"},
+{q:"ك ت ب",answer:"كتب"},
+{q:"ر د ن",answer:"نرد"}
+],
+
+"من هو اللاعب":[
+{q:"رقم 7؟",answer:"رونالدو"},
+{q:"ميسي؟",answer:"لاعب أرجنتيني"},
+{q:"مبابي؟",answer:"لاعب فرنسي"}
+],
+
+"أكلات":[
+{q:"المنسف؟",answer:"طبق أردني"},
+{q:"الفلافل؟",answer:"حمص"},
+{q:"المقلوبة؟",answer:"رز وخضار"}
+],
+
+"اعلام":[
+{q:"علم الأردن؟",answer:"أسود أبيض أخضر أحمر"},
+{q:"علم فلسطين؟",answer:"نفس الألوان"},
+{q:"علم مصر؟",answer:"أحمر أبيض أسود"}
+],
+
+"مسلسلات":[
+{q:"الولادة من الخاصرة؟",answer:"مسلسل"},
+{q:"البطل؟",answer:"تيم حسن"},
+{q:"السنة؟",answer:"2011"}
+]
+};
+
+// =====================
+// شاشة
+// =====================
+function showScreen(id){
+document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+}
+
+// =====================
+// الفئات
+// =====================
+let cats = Object.keys(questions);
+
+let html = "<h2>📚 اختر الفئات</h2>";
+
+cats.forEach((cat)=>{
+html += `<button onclick="toggleCategory(this,'${cat}')">${cat}</button>`;
+});
+
+html += `<br><button onclick="startGame()">ابدأ اللعب</button>`;
+
+document.getElementById("categorySelectScreen").innerHTML = html;
+
+function toggleCategory(btn,cat){
+
+if(selectedCategories.includes(cat)){
+selectedCategories = selectedCategories.filter(c=>c!==cat);
+btn.style.background="";
+}else{
+selectedCategories.push(cat);
+btn.style.background="green";
+}
+}
+
+// =====================
+// بدء اللعبة (مهم)
+// =====================
+function startGame(){
+
+if(selectedCategories.length === 0){
+alert("اختار فئة على الأقل");
+return;
+}
+
+team1Name = document.getElementById("team1").value.trim();
+team2Name = document.getElementById("team2").value.trim();
+
+if(!team1Name || !team2Name){
+alert("اكتب أسماء الفرق");
+return;
+}
+
+goCategories();
+}
+
+// =====================
+// اللوحة
+// =====================
+function goCategories(){
+
+let html = `
+<div class="scoreboard">
+<div>🔴 ${team1Name}: ${score1}</div>
+<div>🔵 ${team2Name}: ${score2}</div>
+</div>
+
+<div class="jeopardy-board">
+`;
+
+selectedCategories.forEach(cat=>{
+html += `<div class="column">
+<div class="category-title">${cat}</div>`;
+
+for(let i=0;i<questions[cat].length;i++){
+let points = (i+1)*100;
+
+html += `
+<button class="point-btn" onclick="openQuestion('${cat}',${i},${points},this)">
+${points}
+</button>`;
+}
+
+html += `</div>`;
+});
+
+html += `</div>`;
+
+document.getElementById("categoryScreen").innerHTML = html;
+showScreen("categoryScreen");
+}
+
+// =====================
+// فتح سؤال
+// =====================
+function openQuestion(cat,index,points,btn){
+
+if(!usedQuestions[cat])usedQuestions[cat]=[];
+
+if(usedQuestions[cat].includes(index)) return;
+
+usedQuestions[cat].push(index);
+
+currentCategory = cat;
+currentQuestion = index;
+currentPoints = points;
+
+btn.disabled = true;
+
+startTimer();
+showQuestion();
+}
+
+// =====================
+// التايمر
+// =====================
+function startTimer(){
+
+clearInterval(timer);
+time = 15;
+
+timer = setInterval(()=>{
+
+time--;
+
+if(time <= 0){
+clearInterval(timer);
+showScreen("categoryScreen");
+checkEnd();
+}
+
+},1000);
+}
+
+// =====================
+// السؤال
+// =====================
+function showQuestion(){
+
+let q = questions[currentCategory][currentQuestion];
+
+document.getElementById("gameScreen").innerHTML = `
+<h2>${currentCategory}</h2>
+<h3>${q.q}</h3>
+
+<button onclick="showAnswer()">إظهار الإجابة</button>
+<button onclick="showScreen('categoryScreen')">رجوع</button>
+
+<div id="ans"></div>
+`;
+
+showScreen("gameScreen");
+}
+
+// =====================
+// الإجابة
+// =====================
+function showAnswer(){
+
+let q = questions[currentCategory][currentQuestion];
+
+document.getElementById("ans").innerHTML = `
+<h2>${q.answer}</h2>
+
+<button onclick="addScore(1)">🔴 ${team1Name}</button>
+<button onclick="addScore(2)">🔵 ${team2Name}</button>
+`;
+}
+
+// =====================
+// النقاط (مصحح 100%)
+// =====================
+function addScore(team){
+
+clearInterval(timer);
+
+if(team === 1){
+score1 = score1 + Number(currentPoints);
+}else{
+score2 = score2 + Number(currentPoints);
+}
+
+updateScoreUI();
+checkEnd();
+showScreen("categoryScreen");
+}
+
+// =====================
+// تحديث السكور
+// =====================
+function updateScoreUI(){
+
+let board = document.querySelector(".scoreboard");
+
+if(board){
+board.innerHTML = `
+<div>🔴 ${team1Name}: ${score1}</div>
+<div>🔵 ${team2Name}: ${score2}</div>
+`;
+}
+
+}
+
+// =====================
+// نهاية اللعبة (مضمونة)
+// =====================
+function checkEnd(){
+
+let total = 0;
+let done = 0;
+
+selectedCategories.forEach(cat=>{
+total += questions[cat].length;
+done += usedQuestions[cat]?.length || 0;
+});
+
+if(done >= total){
+showEnd();
+}
+}
+
+function showEnd(){
+
+let winner = "تعادل";
+
+if(score1 > score2) winner = "🔴 " + team1Name;
+else if(score2 > score1) winner = "🔵 " + team2Name;
+
+document.getElementById("endScreen").innerHTML = `
+<h1>🏆 انتهت اللعبة</h1>
+
+<h2>الفائز: ${winner}</h2>
+
+<p>🔴 ${team1Name}: ${score1}</p>
+<p>🔵 ${team2Name}: ${score2}</p>
+
+<button onclick="goHome()">🏠 العودة للرئيسية</button>
+`;
+
+showScreen("endScreen");
+}
+
+// =====================
+// رجوع للبداية
+// =====================
+function goHome(){
+
+score1 = 0;
+score2 = 0;
+selectedCategories = [];
+usedQuestions = {};
+
+showScreen("startScreen");
+}
+
+</script>
+
+</body>
+</html>

@@ -34,6 +34,11 @@ button{
     cursor:pointer;
 }
 
+button:hover{
+    transform:scale(1.05);
+    transition:0.2s;
+}
+
 .start-btn{
     background:red;
     color:white;
@@ -67,6 +72,15 @@ input{
     padding:10px;
     border-radius:10px;
     font-weight:bold;
+    margin-bottom:10px;
+}
+
+.cat-img{
+    width:100%;
+    height:120px;
+    object-fit:cover;
+    border-radius:12px;
+    margin-bottom:8px;
 }
 
 .point-btn{
@@ -167,6 +181,24 @@ let time = 0;
 window.speechSynthesis.onvoiceschanged = () => {};
 
 // =====================
+// صور الفئات
+// =====================
+
+let categoryImages = {
+
+"معلومات عامة":"images/general.jpg",
+"قصص انبياء":"images/anbia.jpg",
+"جزء تبارك":"images/quran.jpg",
+"رتب الحروف":"images/letters.jpg",
+"من هو اللاعب":"images/player.jpg",
+"أكلات":"images/food.jpg",
+"اعلام":"images/flags.jpg",
+"مسلسلات":"images/series.jpg",
+"ناروتو":"images/naruto.jpg"
+
+};
+
+// =====================
 // الأسئلة
 // =====================
 
@@ -218,6 +250,12 @@ let questions = {
 {q:"الولادة من الخاصرة؟",answer:"مسلسل"},
 {q:"البطل؟",answer:"تيم حسن"},
 {q:"السنة؟",answer:"2011"}
+],
+
+"ناروتو":[
+{q:"من هو الهوكاجي السابع؟",answer:"ناروتو"},
+{q:"اسم أخ ناروتو؟",answer:"لا يوجد"},
+{q:"اسم فريق كاكاشي؟",answer:"الفريق السابع"}
 ]
 
 };
@@ -318,8 +356,17 @@ let html = `
 
 selectedCategories.forEach(cat=>{
 
-html += `<div class="column">
-<div class="category-title">${cat}</div>`;
+html += `
+<div class="column">
+
+<div class="category-title">
+
+<img src="${categoryImages[cat]}" class="cat-img">
+
+<div>${cat}</div>
+
+</div>
+`;
 
 for(let i=0;i<questions[cat].length;i++){
 
@@ -400,7 +447,7 @@ startTimer();
 }
 
 // =====================
-// 🔊 إصلاح الصوت العربي
+// 🔊 الصوت العربي
 // =====================
 
 function speakQuestion(text){
@@ -503,9 +550,8 @@ clearInterval(timer);
 if(team===1) score1+=currentPoints;
 else score2+=currentPoints;
 
-updateScoreUI();
+goCategories();
 checkEnd();
-showScreen("categoryScreen");
 
 }
 
@@ -514,24 +560,9 @@ showScreen("categoryScreen");
 // =====================
 
 function noAnswer(){
-showScreen("categoryScreen");
+
+goCategories();
 checkEnd();
-}
-
-// =====================
-// تحديث
-// =====================
-
-function updateScoreUI(){
-
-let b=document.querySelector(".scoreboard");
-
-if(b){
-b.innerHTML=`
-<div>🔴 ${team1Name}: ${score1}</div>
-<div>🔵 ${team2Name}: ${score2}</div>
-`;
-}
 
 }
 

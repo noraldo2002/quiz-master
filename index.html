@@ -34,11 +34,6 @@ button{
     cursor:pointer;
 }
 
-button:hover{
-    transform:scale(1.05);
-    transition:0.2s;
-}
-
 .start-btn{
     background:red;
     color:white;
@@ -55,18 +50,16 @@ input{
 }
 
 .jeopardy-board{
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
-    gap:15px;
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
     margin-top:20px;
 }
 
 .column{
     background:#1b1b1b;
-    padding:12px;
+    padding:10px;
     border-radius:15px;
-    width:220px;
 }
 
 .category-title{
@@ -74,15 +67,6 @@ input{
     padding:10px;
     border-radius:10px;
     font-weight:bold;
-    margin-bottom:10px;
-}
-
-.cat-img{
-    width:100%;
-    height:140px;
-    object-fit:cover;
-    border-radius:12px;
-    margin-bottom:8px;
 }
 
 .point-btn{
@@ -123,6 +107,7 @@ input{
 
 <body>
 
+<!-- البداية -->
 <div id="startScreen" class="screen active">
 
 <h1>🔥 لعبة التحدي 🔥</h1>
@@ -133,11 +118,13 @@ input{
 
 </div>
 
+<!-- الفرق -->
 <div id="teamScreen" class="screen">
 
 <h1>⚔️ أدخل أسماء الفرق</h1>
 
 <input id="team1" placeholder="الفريق الأول"><br>
+
 <input id="team2" placeholder="الفريق الثاني"><br>
 
 <button onclick="showScreen('categorySelectScreen')">
@@ -146,9 +133,16 @@ input{
 
 </div>
 
+<!-- اختيار الفئات -->
 <div id="categorySelectScreen" class="screen"></div>
+
+<!-- اللوحة -->
 <div id="categoryScreen" class="screen"></div>
+
+<!-- السؤال -->
 <div id="gameScreen" class="screen"></div>
+
+<!-- النهاية -->
 <div id="endScreen" class="screen"></div>
 
 <script>
@@ -169,31 +163,15 @@ let currentPoints = 0;
 let timer;
 let time = 0;
 
-// ===== وسائل المساعدة =====
-let lifelineBomb = true;
-let lifelineHint = true;
-let lifelineDouble = true;
+// تشغيل تحميل الأصوات
+window.speechSynthesis.onvoiceschanged = () => {};
 
-let bombActive = false;
-let doubleActive = false;
-
-let correctAnswer = "";
-
-// الصور
-let categoryImages = {
-"معلومات عامة":"images/general.jpg",
-"قصص انبياء":"images/anbia.jpg",
-"جزء تبارك":"images/quran.jpg",
-"رتب الحروف":"images/letters.jpg",
-"من هو اللاعب":"images/player.jpg",
-"أكلات":"images/food.jpg",
-"اعلام":"images/flags.jpg",
-"مسلسلات":"images/series.jpg",
-"ناروتو":"images/naruto.jpg"
-};
-
+// =====================
 // الأسئلة
+// =====================
+
 let questions = {
+
 "معلومات عامة":[
 {q:"ما عاصمة الأردن؟",answer:"عمان"},
 {q:"كم قارة؟",answer:"7"},
@@ -240,22 +218,28 @@ let questions = {
 {q:"الولادة من الخاصرة؟",answer:"مسلسل"},
 {q:"البطل؟",answer:"تيم حسن"},
 {q:"السنة؟",answer:"2011"}
-],
-
-"ناروتو":[
-{q:"من هو الهوكاجي السابع؟",answer:"ناروتو"},
-{q:"اسم أخ ناروتو؟",answer:"لا يوجد"},
-{q:"اسم فريق كاكاشي؟",answer:"الفريق السابع"}
 ]
+
 };
 
-// تغيير الشاشة
+// =====================
+// الشاشة
+// =====================
+
 function showScreen(id){
-document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+
+document.querySelectorAll('.screen').forEach(s=>{
+s.classList.remove('active');
+});
+
 document.getElementById(id).classList.add('active');
+
 }
 
+// =====================
 // اختيار الفئات
+// =====================
+
 let cats = Object.keys(questions);
 
 let html = "<h2>📚 اختر الفئات (2 أو 4 أو 6 فقط)</h2>";
@@ -274,16 +258,22 @@ if(selectedCategories.includes(cat)){
 selectedCategories = selectedCategories.filter(c=>c!==cat);
 btn.style.background = "";
 }else{
+
 if(selectedCategories.length >= 6){
 alert("الحد الأقصى 6 فئات");
 return;
 }
+
 selectedCategories.push(cat);
 btn.style.background = "green";
 }
+
 }
 
+// =====================
 // بدء اللعبة
+// =====================
+
 function startGame(){
 
 if(
@@ -304,30 +294,32 @@ return;
 }
 
 goCategories();
+
 }
 
+// =====================
 // اللوحة
+// =====================
+
 function goCategories(){
 
 let html = `
+
 <div class="scoreboard">
 <div>🔴 ${team1Name}: ${score1}</div>
 <div>🔵 ${team2Name}: ${score2}</div>
 </div>
 
+<button class="end-btn" onclick="showEnd()">🏁 إنهاء اللعبة</button>
+
 <div class="jeopardy-board">
+
 `;
 
 selectedCategories.forEach(cat=>{
 
-html += `
-<div class="column">
-
-<div class="category-title">
-<img src="${categoryImages[cat]}" class="cat-img">
-<div>${cat}</div>
-</div>
-`;
+html += `<div class="column">
+<div class="category-title">${cat}</div>`;
 
 for(let i=0;i<questions[cat].length;i++){
 
@@ -341,18 +333,27 @@ ${points}
 }
 
 html += `</div>`;
+
 });
 
 html += `</div>`;
 
 document.getElementById("categoryScreen").innerHTML = html;
+
 showScreen("categoryScreen");
+
 }
 
+// =====================
 // فتح السؤال
+// =====================
+
 function openQuestion(cat,index,points,btn){
 
-if(!usedQuestions[cat]) usedQuestions[cat]=[];
+if(!usedQuestions[cat]){
+usedQuestions[cat]=[];
+}
+
 if(usedQuestions[cat].includes(index)) return;
 
 usedQuestions[cat].push(index);
@@ -361,24 +362,93 @@ currentCategory=cat;
 currentQuestion=index;
 currentPoints=points;
 
-bombActive=false;
-doubleActive=false;
-
 btn.disabled=true;
 
 startTimer();
 showQuestion();
+
 }
 
+// =====================
+// التايمر
+// =====================
+
+function startTimer(){
+
+clearInterval(timer);
+
+time=0;
+
+timer=setInterval(()=>{
+
+time++;
+
+let t=document.getElementById("timer");
+if(t) t.innerText="⏱️ "+time;
+
+},1000);
+
+}
+
+function resetTimer(){
+
+clearInterval(timer);
+time=0;
+document.getElementById("timer").innerText="⏱️ 0";
+startTimer();
+
+}
+
+// =====================
+// 🔊 إصلاح الصوت العربي
+// =====================
+
+function speakQuestion(text){
+
+function speak(){
+
+let voices = window.speechSynthesis.getVoices();
+
+let arabicVoice =
+voices.find(v => v.lang.includes("ar")) ||
+voices.find(v => v.lang.includes("AR")) ||
+voices[0];
+
+let speech = new SpeechSynthesisUtterance(text);
+
+speech.lang = "ar-SA";
+speech.rate = 0.9;
+
+if(arabicVoice){
+speech.voice = arabicVoice;
+}
+
+window.speechSynthesis.cancel();
+window.speechSynthesis.speak(speech);
+
+}
+
+if(window.speechSynthesis.getVoices().length === 0){
+window.speechSynthesis.onvoiceschanged = speak;
+}else{
+speak();
+}
+
+}
+
+// =====================
 // عرض السؤال
+// =====================
+
 function showQuestion(){
 
 let q = questions[currentCategory][currentQuestion];
-correctAnswer = q.answer;
 
 document.getElementById("gameScreen").innerHTML = `
 
 <div id="timer">⏱️ 0</div>
+
+<button onclick="resetTimer()">🔄 إعادة الوقت</button>
 
 <h2>${currentCategory}</h2>
 
@@ -388,47 +458,20 @@ document.getElementById("gameScreen").innerHTML = `
 
 <button onclick="showScreen('categoryScreen')">رجوع</button>
 
-<br><br>
-
-<h3>🧠 وسائل المساعدة</h3>
-
-<button onclick="useBomb()" ${!lifelineBomb?"disabled":""}>💣 قصف</button>
-<button onclick="useHint()" ${!lifelineHint?"disabled":""}>🔤 تلميح</button>
-<button onclick="useDouble()" ${!lifelineDouble?"disabled":""}>✖️ دبل</button>
-
 <div id="ans"></div>
 
 `;
 
 showScreen("gameScreen");
+
+speakQuestion(q.q);
+
 }
 
-// 💣 قصف
-function useBomb(){
-if(!lifelineBomb) return;
-lifelineBomb=false;
-bombActive=true;
-alert("💣 تم تفعيل القصف");
-}
-
-// 🔤 تلميح
-function useHint(){
-if(!lifelineHint) return;
-lifelineHint=false;
-
-let a = correctAnswer;
-alert("🔤 التلميح: " + a[0] + " ... " + a[a.length-1]);
-}
-
-// ✖️ دبل
-function useDouble(){
-if(!lifelineDouble) return;
-lifelineDouble=false;
-currentPoints*=2;
-alert("✖️ تم تفعيل الدبل");
-}
-
+// =====================
 // الإجابة
+// =====================
+
 function showAnswer(){
 
 clearInterval(timer);
@@ -436,41 +479,138 @@ clearInterval(timer);
 let q = questions[currentCategory][currentQuestion];
 
 document.getElementById("ans").innerHTML = `
+
 <h2>${q.answer}</h2>
+
+<h3>مين جاوب صح؟</h3>
 
 <button onclick="addScore(1)">🔴 ${team1Name}</button>
 <button onclick="addScore(2)">🔵 ${team2Name}</button>
+<button onclick="noAnswer()">❌ ولا حد</button>
+
 `;
 
 }
 
+// =====================
 // النقاط
+// =====================
+
 function addScore(team){
 
 clearInterval(timer);
 
-if(team===1){
-score1+=currentPoints;
-if(bombActive) score2-=Math.floor(currentPoints/2);
-}else{
-score2+=currentPoints;
-if(bombActive) score1-=Math.floor(currentPoints/2);
+if(team===1) score1+=currentPoints;
+else score2+=currentPoints;
+
+updateScoreUI();
+checkEnd();
+showScreen("categoryScreen");
+
 }
 
-if(score1<0) score1=0;
-if(score2<0) score2=0;
+// =====================
+// ولا حد
+// =====================
 
-goCategories();
+function noAnswer(){
+showScreen("categoryScreen");
+checkEnd();
 }
 
-// التايمر
-function startTimer(){
+// =====================
+// تحديث
+// =====================
+
+function updateScoreUI(){
+
+let b=document.querySelector(".scoreboard");
+
+if(b){
+b.innerHTML=`
+<div>🔴 ${team1Name}: ${score1}</div>
+<div>🔵 ${team2Name}: ${score2}</div>
+`;
+}
+
+}
+
+// =====================
+// النهاية
+// =====================
+
+function checkEnd(){
+
+let total=0;
+let done=0;
+
+selectedCategories.forEach(cat=>{
+total+=questions[cat].length;
+if(usedQuestions[cat]) done+=usedQuestions[cat].length;
+});
+
+if(done>=total) showEnd();
+
+}
+
+// =====================
+// إنهاء
+// =====================
+
+function showEnd(){
+
 clearInterval(timer);
-time=0;
-timer=setInterval(()=>{
-time++;
-document.getElementById("timer").innerText="⏱️ "+time;
-},1000);
+window.speechSynthesis.cancel();
+
+let winner="تعادل";
+
+if(score1>score2) winner="🔴 "+team1Name;
+else if(score2>score1) winner="🔵 "+team2Name;
+
+document.getElementById("endScreen").innerHTML=`
+
+<h1>🏆 انتهت اللعبة</h1>
+
+<h2>الفائز: ${winner}</h2>
+
+<p>🔴 ${team1Name}: ${score1}</p>
+<p>🔵 ${team2Name}: ${score2}</p>
+
+<button onclick="goHome()">🏠 العودة</button>
+
+`;
+
+showScreen("endScreen");
+
+}
+
+// =====================
+// الرجوع
+// =====================
+
+function goHome(){
+
+score1=0;
+score2=0;
+
+selectedCategories=[];
+usedQuestions={};
+
+team1Name="";
+team2Name="";
+
+clearInterval(timer);
+window.speechSynthesis.cancel();
+
+document.getElementById("team1").value="";
+document.getElementById("team2").value="";
+
+document.querySelectorAll("#categorySelectScreen button").forEach(b=>{
+b.style.background="";
+});
+
+showScreen("startScreen");
+
 }
 
 </script>
